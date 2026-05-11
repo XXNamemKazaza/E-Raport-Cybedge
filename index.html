@@ -48,7 +48,6 @@
     </div>
 
     <div id="auth-wrapper" class="fixed inset-0 z-50 bg-indigo-900 flex items-center justify-center overflow-y-auto">
-        
         <div id="form-login" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md m-4 transition-all duration-300 relative overflow-hidden">
             <div id="login-progress" class="absolute top-0 left-0 h-1 bg-indigo-500 transition-all duration-300 w-0"></div>
             <div class="text-center mb-8 mt-2"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mb-4 text-3xl"><i class="fa-solid fa-graduation-cap"></i></div><h2 class="text-2xl font-bold text-gray-800">Login Sistem</h2></div>
@@ -173,7 +172,6 @@
                             <div class="flex-1"><label class="block text-xs font-bold text-gray-500 uppercase mb-2">Kategori Nilai</label><select id="kategori-nilai-input" onchange="renderInputNilai()" class="w-full rounded-md border-gray-300 border p-2.5 text-sm focus:ring-indigo-500 font-semibold text-indigo-700"><option value="Nilai Mata Pelajaran">Nilai Mata Pelajaran</option><option value="Nilai Ekstrakurikuler">Nilai Ekstrakurikuler</option><option value="Nilai Kokurikuler">Nilai Kokurikuler</option><option value="Nilai Sikap">Nilai Sikap / BK</option></select></div>
                             <div class="flex-1"><label class="block text-xs font-bold text-gray-500 uppercase mb-2">Filter Kelas</label><select id="filter-kelas-input" onchange="renderInputNilai()" class="w-full rounded-md border-gray-300 border p-2.5 text-sm focus:ring-indigo-500"><option value="">Pilih Kelas...</option></select></div>
                         </div>
-                        
                         <div class="flex space-x-2 mb-6 border-b border-gray-100 pb-4">
                             <button onclick="toggleTabInput('manual')" id="tab-input-manual" class="px-4 py-2 text-sm font-semibold rounded-md bg-indigo-600 text-white transition">Input Manual</button>
                             <button onclick="toggleTabInput('excel')" id="tab-input-excel" class="px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-600 transition hover:bg-gray-200">Import Excel</button>
@@ -324,7 +322,7 @@
             else { document.getElementById('sidebar-guru-menu').classList.remove('hidden'); document.getElementById('sidebar-admin-menu').classList.add('hidden'); document.getElementById('dash-info-role').innerHTML = `Mapel Ajar: <strong class="text-indigo-800">${SESSION_DATA.Mapel}</strong> | Kelas: <strong class="text-indigo-800">${SESSION_DATA.Kelas_Diajar}</strong>`; if(SESSION_DATA.Kelas_Diajar !== "-") arrKelas = SESSION_DATA.Kelas_Diajar.split(',').map(k => k.trim().toUpperCase()); }
 
             if(SESSION_DATA.Role === 'Admin' || (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-")) { document.getElementById('menu-item-man-siswa-container').classList.remove('hidden'); } 
-            else { document.getElementById('menu-item-data-siswa-link').classList.add('hidden'); document.getElementById('menu-item-kelola-nilai-link').classList.add('hidden'); } // Mapel biasa hide all manajemen
+            else { document.getElementById('menu-item-data-siswa-link').classList.add('hidden'); document.getElementById('menu-item-kelola-nilai-link').classList.add('hidden'); } 
 
             let btnHtml = `<button onclick="setDashFilter('Semua')" id="btn-filt-Semua" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white">SEMUA</button>`;
             arrKelas.forEach(k => { btnHtml += `<button onclick="setDashFilter('${k}')" id="btn-filt-${k}" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 text-gray-700 hover:bg-gray-300">${k}</button>`; });
@@ -334,52 +332,42 @@
             manualSync(); if(autoSyncTimer) clearInterval(autoSyncTimer); autoSyncTimer = setInterval(silentSync, 60000); 
         }
 
-       // --- SYNC ENGINE (SINGLE PAYLOAD - SUPER FAST) ---
+        // --- NEW SYNC ENGINE (POST: ONE-SHOT) ---
         const syncDot = document.getElementById('sync-dot'); const syncText = document.getElementById('sync-text');
         function setSyncStatus(st) { syncDot.className = "w-3 h-3 rounded-full " + (st==='syncing'?'syncing':st==='success'?'synced':'sync-error'); syncText.innerText = st==='syncing'?'Syncing...':st==='success'?'Terhubung':'Error DB'; }
 
         async function silentSync() {
             setSyncStatus('syncing');
             try {
-                // Trik Anti-Cache agar selalu minta data baru
-                const t = new Date().getTime(); 
-                
-                // Cukup 1 kali tembak dengan parameter table=all
-                const response = await fetch(`${API_URL}?table=all&t=${t}`);
+                // Tembak POST API untuk ambil semua data
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "readAll" })
+                });
                 const result = await response.json();
                 
                 if(result.status === 'success') {
-                    const all = result.data; // Ini paket besar berisi semua tabel dari server
-
-                    // 1. Masukkan ke Master Siswa
+                    const all = result.data;
                     MASTER_DATA_SISWA = (all.DataSiswa || []).map(s => ({...s, _nis_lama: s.NIS})); 
                     ORIGINAL_DATA_SISWA = JSON.parse(JSON.stringify(MASTER_DATA_SISWA)); 
-                    
-                    // 2. Masukkan ke Master Pengguna
                     MASTER_DATA_PENGGUNA = all.DataPengguna || [];
                     
-                    // 3. Masukkan ke Semua Objek Nilai
                     ALL_NILAI_DATA.NilaiMapel = all.NilaiMapel || []; 
                     ALL_NILAI_DATA.NilaiEkskul = all.NilaiEkskul || []; 
                     ALL_NILAI_DATA.NilaiKokurikuler = all.NilaiKokurikuler || []; 
                     ALL_NILAI_DATA.NilaiSikap = all.NilaiSikap || [];
                     
-                    // Bersihkan antrean edit lokal
-                    PENDING_EDITS = []; 
-                    PENDING_DELETES = []; 
-                    
-                    updatePendingUI(); 
-                    updateDashboardAndData(); 
-                    setSyncStatus('success');
+                    PENDING_EDITS = []; PENDING_DELETES = []; 
+                    updatePendingUI(); updateDashboardAndData(); setSyncStatus('success');
                 } else { 
+                    console.error("Error from API:", result.message);
                     setSyncStatus('error'); 
                 }
             } catch(e) { 
-                console.error("Error Syncing:", e);
+                console.error("Fetch Error:", e);
                 setSyncStatus('error'); 
             }
         }
-
         async function manualSync() { startProgress('app-progress'); await silentSync(); endProgress('app-progress'); }
 
         // --- DASHBOARD & SELECT OPTIONS ---
@@ -417,20 +405,12 @@
             const t = document.getElementById('tbody-siswa'); t.innerHTML = d.length===0?`<tr><td colspan="5" class="px-6 py-6 text-center text-gray-400">Tidak ada data.</td></tr>`:d.map(s => `<tr class="hover:bg-gray-50"><td class="px-6 py-3 text-sm">${s.No_Absen}</td><td class="px-6 py-3 text-sm font-medium">${s.NIS}</td><td class="px-6 py-3 text-sm">${s.Nama_Lengkap}</td><td class="px-6 py-3 text-sm font-semibold text-indigo-600">${s.Kelas}</td><td class="px-6 py-3 text-sm text-center">${s.Gender}</td></tr>`).join('');
         }
 
-        // --- TOGGLE TAB ISOLATION FIX (Memisahkan Manual vs Excel) ---
+        // --- UI TOGGLES ---
         function toggleTabInput(type) {
             const btnMan = document.getElementById('tab-input-manual'); const btnExc = document.getElementById('tab-input-excel');
             const areaMan = document.getElementById('area-input-manual'); const areaExc = document.getElementById('area-input-excel');
-            
-            if(type === 'manual') {
-                btnMan.className = "px-4 py-2 text-sm font-semibold rounded-md bg-indigo-600 text-white transition";
-                btnExc.className = "px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-600 transition hover:bg-gray-200";
-                areaMan.classList.remove('hidden'); areaExc.classList.add('hidden');
-            } else {
-                btnExc.className = "px-4 py-2 text-sm font-semibold rounded-md bg-indigo-600 text-white transition";
-                btnMan.className = "px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-600 transition hover:bg-gray-200";
-                areaExc.classList.remove('hidden'); areaMan.classList.add('hidden');
-            }
+            if(type === 'manual') { btnMan.className = "px-4 py-2 text-sm font-semibold rounded-md bg-indigo-600 text-white transition"; btnExc.className = "px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-600 transition hover:bg-gray-200"; areaMan.classList.remove('hidden'); areaExc.classList.add('hidden'); } 
+            else { btnExc.className = "px-4 py-2 text-sm font-semibold rounded-md bg-indigo-600 text-white transition"; btnMan.className = "px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-600 transition hover:bg-gray-200"; areaExc.classList.remove('hidden'); areaMan.classList.add('hidden'); }
         }
         function toggleTabSiswa(type) {
             const btnS = document.getElementById('tab-siswa-single'); const btnB = document.getElementById('tab-siswa-bulk'); const btnT = document.getElementById('tab-siswa-tabel');
@@ -439,7 +419,6 @@
             btnS.className = type==='single'?cOn:cOff; btnB.className = type==='bulk'?cOn:cOff; btnT.className = type==='tabel'?cOn:cOff;
             areaS.className = type==='single'?"max-w-2xl":"hidden"; areaB.className = type==='bulk'?"":"hidden"; areaT.className = type==='tabel'?"":"hidden";
         }
-        
         function toggleProfileMenu(e) { e.stopPropagation(); document.getElementById('profile-menu-box').classList.toggle('hidden'); }
         function closeProfileMenu(e) { if(!e.target.closest('.profile-dropdown-container')) { const box = document.getElementById('profile-menu-box'); if(box) box.classList.add('hidden'); } }
 
@@ -505,10 +484,7 @@
         let excelTimer;
         document.getElementById('inp-excel-nilai').addEventListener('input', (e) => {
             clearTimeout(excelTimer);
-            excelTimer = setTimeout(() => {
-                const l = e.target.value.trim().split('\n').filter(x => x).length;
-                document.getElementById('info-excel-nilai').innerText = `${l} baris terdeteksi.`;
-            }, 300);
+            excelTimer = setTimeout(() => { const l = e.target.value.trim().split('\n').filter(x => x).length; document.getElementById('info-excel-nilai').innerText = `${l} baris terdeteksi.`; }, 300);
         });
 
         function validasiExcelNilai() {
@@ -579,14 +555,11 @@
         }
 
         function previewKoku(nama, text) {
-            document.getElementById('koku-nama-siswa').innerText = nama;
-            document.getElementById('koku-teks-deskripsi').innerText = text;
-            const modal = document.getElementById('modal-preview-koku'); const content = document.getElementById('modal-koku-content');
-            modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(() => content.classList.remove('scale-95'), 10);
+            document.getElementById('koku-nama-siswa').innerText = nama; document.getElementById('koku-teks-deskripsi').innerText = text;
+            const modal = document.getElementById('modal-preview-koku'); const content = document.getElementById('modal-koku-content'); modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(() => content.classList.remove('scale-95'), 10);
         }
         function closeModalKoku() {
-            const modal = document.getElementById('modal-preview-koku'); const content = document.getElementById('modal-koku-content');
-            content.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
+            const modal = document.getElementById('modal-preview-koku'); const content = document.getElementById('modal-koku-content'); content.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
         }
 
         // --- MANAJEMEN KELOLA NILAI (Hapus) ---
@@ -655,7 +628,7 @@
         async function submitSingleSiswa(e) { e.preventDefault(); const btn = document.getElementById('btn-simpan-siswa-single'); btn.disabled = true; startProgress('app-progress'); showToast('Menyimpan...', 'info'); const data = { No_Absen: document.getElementById('inp-noabsen').value, NIS: document.getElementById('inp-nis').value, Nama_Lengkap: document.getElementById('inp-nama').value, Kelas: document.getElementById('inp-kelas').value.toUpperCase(), Gender: document.getElementById('inp-gender').value }; try { const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "insertSingle", table: "DataSiswa", data: data }) }); const json = await res.json(); if(json.status==='success') { showToast("Siswa ditambahkan!", 'success'); document.getElementById('form-single-siswa').reset(); manualSync(); } else { showToast(json.message, 'error'); alert(json.message); } } catch(e) { showToast("Error koneksi.", 'error'); } btn.disabled = false; endProgress('app-progress'); }
         async function submitBulkSiswa() { const raw = document.getElementById('inp-excel-paste').value.trim(); if(!raw) return showToast('Kosong.', 'warning'); const btn = document.getElementById('btn-simpan-siswa-bulk'); btn.disabled = true; startProgress('app-progress'); const dataArray = raw.split('\n').map(l => { const c = l.split('\t'); return { No_Absen: c[0], NIS: c[1], Nama_Lengkap: c[2], Kelas: c[3]?.toUpperCase(), Gender: c[4] || "L" }; }); try { const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "insertBulk", table: "DataSiswa", data: dataArray }) }); const json = await res.json(); if(json.status==='success') { showToast("Data diimport!", 'success'); document.getElementById('inp-excel-paste').value = ""; manualSync(); if(json.message.includes('dilewati')) alert(json.message); } else showToast('Gagal import.', 'error'); } catch(e) { showToast("Error koneksi.", 'error'); } btn.disabled = false; endProgress('app-progress'); }
 
-        // Navigation Menu Highlight
+        // Navigation Menu
         function showPage(p) { document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden')); document.getElementById(p).classList.remove('hidden'); document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('bg-indigo-900/50', 'border-indigo-400')); const m = document.getElementById('menu-'+p); if(m) m.classList.add('bg-indigo-900/50', 'border-indigo-400'); document.getElementById('page-title').innerText = p.replace('-', ' ').toUpperCase(); }
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
     </script>
