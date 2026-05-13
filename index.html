@@ -1366,7 +1366,18 @@
             isSyncing = false; endProgress('app-progress');
         }
 
-        function updatePendingUI() { const count = PENDING_EDITS.length + PENDING_DELETES.length; const bar = document.getElementById('bar-pending-changes'); if(count > 0) { document.getElementById('text-pending-count').innerText = count; bar.classList.remove('hidden'); } else { bar.classList.add('hidden'); } }
+        function updatePendingUI() { 
+    const count = PENDING_EDITS.length + PENDING_DELETES.length; 
+    const bar = document.getElementById('bar-pending-changes'); 
+    if(!bar) return; // ← tambah guard ini
+    if(count > 0) { 
+        const countEl = document.getElementById('text-pending-count');
+        if(countEl) countEl.innerText = count; 
+        bar.classList.remove('hidden'); 
+    } else { 
+        bar.classList.add('hidden'); 
+    } 
+}
         function batalPerubahanMassal() { MASTER_DATA_SISWA = JSON.parse(JSON.stringify(ORIGINAL_DATA_SISWA)); PENDING_EDITS = []; PENDING_DELETES = []; updatePendingUI(); renderTabelManajemen(); updateDashboardAndData(); showToast('Perubahan dibatalkan.', 'info'); }
         async function simpanPerubahanMassal() {
             isSyncing = true; startProgress('app-progress'); showToast('Menyinkronkan perubahan massal...', 'info');
