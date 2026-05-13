@@ -274,7 +274,6 @@
                 <!-- SECTION DASHBOARD -->
                 <section id="dashboard" class="page-section animate-fade-in">
                     
-                    <!-- Banner Welcome (REVISI ESTETIK) -->
                     <div class="bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-800 dark:via-gray-800 dark:to-indigo-900/30 border-l-4 border-indigo-600 p-6 md:p-8 rounded-2xl mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between relative overflow-hidden">
                         <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/3 -translate-y-1/4">
                             <i class="fa-solid fa-graduation-cap text-[150px] text-indigo-500"></i>
@@ -287,10 +286,7 @@
 
                     <div class="mb-5"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3"><i class="fa-solid fa-filter mr-1"></i> Filter Data Dashboard:</p><div id="dash-filter-buttons" class="flex flex-wrap gap-2"></div></div>
                     
-                    <!-- Grid Box Statistik & Mapel (REVISI ESTETIK) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        
-                        <!-- Box Total Siswa Terfilter -->
                         <div class="bg-gradient-to-br from-white to-indigo-50/50 dark:from-gray-800 dark:to-indigo-900/20 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-800/50 p-6 relative overflow-hidden group hover:shadow-lg transition duration-300">
                             <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4">
                                 <i class="fa-solid fa-users text-[120px] text-indigo-600"></i>
@@ -314,7 +310,6 @@
                             </div>
                         </div>
 
-                        <!-- Box Informasi Kelas Ajar -->
                         <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800 dark:to-blue-900/20 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/50 p-6 relative overflow-hidden group hover:shadow-lg transition duration-300">
                             <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4">
                                 <i class="fa-solid fa-book-open text-[120px] text-blue-600"></i>
@@ -537,6 +532,34 @@
                                 <select id="filter-kelas-manajemen" onchange="renderTabelManajemen()" class="rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-48"><option value="Semua">Semua Kelas</option></select>
                                 <div class="relative flex-1"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="search-manajemen" onkeyup="renderTabelManajemen()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-2.5 pl-10 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cari NIS / Nama..."></div>
                             </div>
+
+                            <!-- INFO WALI KELAS (ADMIN ONLY) -->
+                            <div id="admin-info-walikelas" class="hidden mb-5 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 p-5 rounded-xl border-l-4 border-indigo-500 shadow-sm transition-all animate-fade-in">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Informasi Kelas</p>
+                                        <h4 class="text-2xl font-black text-indigo-700 dark:text-indigo-400" id="ai-kelas">-</h4>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full md:w-auto">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Wali Kelas</p>
+                                        <p class="font-bold text-gray-800 dark:text-gray-200 flex items-center" id="ai-wali"><i class="fa-solid fa-user-tie text-indigo-500 mr-2"></i> <span>-</span></p>
+                                    </div>
+                                    <div class="flex gap-3 w-full md:w-auto">
+                                        <div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center">
+                                            <p class="text-[10px] font-bold text-blue-500 uppercase">Laki</p>
+                                            <p class="font-bold text-gray-800 dark:text-gray-200" id="ai-L">0</p>
+                                        </div>
+                                        <div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center">
+                                            <p class="text-[10px] font-bold text-pink-500 uppercase">Perempuan</p>
+                                            <p class="font-bold text-gray-800 dark:text-gray-200" id="ai-P">0</p>
+                                        </div>
+                                        <div class="bg-indigo-500 px-3 py-2 rounded-lg shadow-sm border border-indigo-600 flex-1 text-center text-white">
+                                            <p class="text-[10px] font-bold uppercase opacity-80">Total</p>
+                                            <p class="font-bold" id="ai-total">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                                 <table class="w-full text-left border-collapse">
@@ -562,19 +585,28 @@
                         <h3 class="font-bold text-xl md:text-2xl mb-2 text-gray-800 dark:text-white"><i class="fa-solid fa-server text-indigo-500 mr-2"></i> Pusat Kendali Data Nilai</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Pilih kelas secara spesifik untuk melihat seluruh siswa dan mengelola nilainya (Edit/Hapus).</p>
                         
-                        <div class="bg-indigo-50/50 dark:bg-gray-900/50 p-4 rounded-xl border border-indigo-100 dark:border-gray-700 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 text-yellow-600 dark:text-yellow-400"><i class="fa-solid fa-star text-[10px] mr-1"></i> 1. Wajib Pilih Kelas</label>
-                                <select id="pk-kelas" onchange="onClassChangePK()" class="w-full rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-600/50 border-2 p-3 text-sm focus:ring-2 focus:ring-yellow-500 outline-none text-gray-800 dark:text-gray-200 font-semibold">
-                                    <option value="">-- Pilih Kelas --</option>
-                                </select>
-                                <p id="notif-wali-pk" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Ini adalah Kelas Perwalian Anda.</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori</label>
-                                <select id="pk-kategori" onchange="renderTabelKelolaNilai()" disabled class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed">
-                                    <option value="">-- Pilih Kelas Dulu --</option>
-                                </select>
+                        <div class="bg-indigo-50/50 dark:bg-gray-900/50 p-4 rounded-xl border border-indigo-100 dark:border-gray-700 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 text-yellow-600 dark:text-yellow-400"><i class="fa-solid fa-star text-[10px] mr-1"></i> 1. Wajib Pilih Kelas</label>
+                                    <select id="pk-kelas" onchange="onClassChangePK()" class="w-full rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-600/50 border-2 p-3 text-sm focus:ring-2 focus:ring-yellow-500 outline-none text-gray-800 dark:text-gray-200 font-semibold">
+                                        <option value="">-- Pilih Kelas --</option>
+                                    </select>
+                                    <p id="notif-wali-pk" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Kelas Perwalian Anda.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori</label>
+                                    <select id="pk-kategori" onchange="onChangeCategoryPK()" disabled class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed">
+                                        <option value="">-- Pilih Kelas Dulu --</option>
+                                    </select>
+                                </div>
+                                <!-- DROPDOWN FILTER MAPEL ADMIN -->
+                                <div id="container-filter-mapel-admin" class="hidden">
+                                    <label class="block text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase mb-2">3. Filter Mapel (Admin)</label>
+                                    <select id="pk-mapel-admin" onchange="renderTabelKelolaNilai()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-800 dark:text-gray-200 font-semibold">
+                                        <option value="">Semua Mata Pelajaran</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         
@@ -748,11 +780,30 @@
 
         function onClassChangePK() {
             const kls = document.getElementById('pk-kelas').value; const catSel = document.getElementById('pk-kategori'); const notif = document.getElementById('notif-wali-pk');
-            if (!kls || kls === "Semua") { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); renderTabelKelolaNilai(); return; }
+            if (!kls || kls === "Semua") { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); onChangeCategoryPK(); return; }
             catSel.disabled = false;
             const isWali = (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
             if (isWali) notif.classList.remove('hidden'); else notif.classList.add('hidden');
             catSel.innerHTML = generateCategoryOptions(isWali, false);
+            onChangeCategoryPK();
+        }
+
+        function onChangeCategoryPK() {
+            const cat = document.getElementById('pk-kategori').value;
+            const containerMapelAdmin = document.getElementById('container-filter-mapel-admin');
+            const selectMapelAdmin = document.getElementById('pk-mapel-admin');
+
+            if (SESSION_DATA.Role === 'Admin' && (cat === 'NilaiMapel' || cat === 'NilaiCP')) {
+                let mapels = new Set();
+                MASTER_DATA_PENGGUNA.forEach(g => { if(g.Mapel && g.Mapel !== "-") mapels.add(g.Mapel); });
+                let currentVal = selectMapelAdmin.value;
+                selectMapelAdmin.innerHTML = `<option value="">Semua Mata Pelajaran</option>` + [...mapels].sort().map(m => `<option value="${m}">${m}</option>`).join('');
+                if([...mapels].includes(currentVal)) selectMapelAdmin.value = currentVal;
+                containerMapelAdmin.classList.remove('hidden');
+            } else {
+                containerMapelAdmin.classList.add('hidden');
+                selectMapelAdmin.value = "";
+            }
             renderTabelKelolaNilai();
         }
 
@@ -761,7 +812,6 @@
             document.getElementById('ui-nama-guru').innerText = SESSION_DATA.Nama_Lengkap; document.getElementById('prof-nama').innerText = SESSION_DATA.Nama_Lengkap; document.getElementById('prof-role').innerText = SESSION_DATA.Role; document.getElementById('prof-wali').innerText = SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-" ? SESSION_DATA.Wali_Kelas : "Bukan"; document.getElementById('prof-mapel').innerText = SESSION_DATA.Mapel === "-" ? "-" : SESSION_DATA.Mapel; document.getElementById('prof-kelas').innerText = SESSION_DATA.Kelas_Diajar === "-" ? "-" : SESSION_DATA.Kelas_Diajar.replace(/,/g, ', ');
             let rText = SESSION_DATA.Role; if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") rText += ` (Wali ${SESSION_DATA.Wali_Kelas})`; document.getElementById('ui-role').innerText = rText;
 
-            // --- REVISI BANNER WELCOME DI JS ---
             document.getElementById('welcome-msg').innerHTML = `Selamat Datang, <span class="text-indigo-600 dark:text-indigo-400">${SESSION_DATA.Nama_Lengkap}</span> 👋`;
 
             if(SESSION_DATA.Role === 'Admin') { 
@@ -770,7 +820,6 @@
             } else { 
                 document.getElementById('dash-info-role').innerHTML = `<i class="fa-solid fa-book-open text-indigo-500 dark:text-indigo-400 mr-2"></i> Guru Mata Pelajaran: <strong class="text-gray-800 dark:text-gray-200 ml-1">${SESSION_DATA.Mapel}</strong>`; 
                 
-                // Box Info Ajar (Bawah)
                 document.getElementById('info-mapel-dashboard').innerText = SESSION_DATA.Mapel;
                 const infoContainer = document.getElementById('info-kelas-dashboard');
                 if(SESSION_DATA.Kelas_Diajar !== "-") { infoContainer.innerHTML = SESSION_DATA.Kelas_Diajar.split(',').map(k => `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-bold border border-gray-200 dark:border-gray-600 shadow-sm">${k.trim()}</span>`).join(''); } 
@@ -780,13 +829,6 @@
                 document.getElementById('menu-item-man-siswa-container').classList.remove('hidden'); document.getElementById('menu-item-kelola-nilai-link').classList.remove('hidden');
                 if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { document.getElementById('menu-item-data-siswa-link').classList.remove('hidden'); } else { document.getElementById('menu-item-data-siswa-link').classList.add('hidden'); }
             } 
-
-            const btnContainer = document.getElementById('dash-filter-buttons'); let arrKelas = [];
-            if(SESSION_DATA.Kelas_Diajar !== "-") arrKelas = SESSION_DATA.Kelas_Diajar.split(',').map(k => k.trim().toUpperCase()); 
-
-            let btnHtml = `<button onclick="setDashFilter('Semua')" id="btn-filt-Semua" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white">SEMUA</button>`;
-            arrKelas.forEach(k => { btnHtml += `<button onclick="setDashFilter('${k}')" id="btn-filt-${k}" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">${k}</button>`; });
-            btnContainer.innerHTML = btnHtml;
             
             manualSync(); if(autoSyncTimer) clearInterval(autoSyncTimer); autoSyncTimer = setInterval(() => { if (!isSyncing) silentSync(); }, 60000);
         }
@@ -885,12 +927,29 @@
                 } else { contWali.classList.add('hidden'); }
             } else { boxPemantauan.classList.add('hidden'); }
 
-            let kelasSelect = [...new Set(MASTER_DATA_SISWA.map(s => s.Kelas))]; let arrKelasDiajar = [];
+            // Extract ALL unique classes from registered users for dropdowns
+            let allClasses = new Set();
+            MASTER_DATA_PENGGUNA.forEach(g => {
+                if(g.Kelas_Diajar && g.Kelas_Diajar !== "-") { g.Kelas_Diajar.split(',').forEach(c => allClasses.add(c.trim().toUpperCase())); }
+                if(g.Wali_Kelas && g.Wali_Kelas !== "-") { allClasses.add(g.Wali_Kelas.trim().toUpperCase()); }
+            });
+            MASTER_DATA_SISWA.forEach(s => allClasses.add(s.Kelas.trim().toUpperCase()));
+            
+            let kelasSelect = [...allClasses].sort(); 
+            let arrKelasDiajar = [];
             if(SESSION_DATA.Role !== 'Admin') { 
                 arrKelasDiajar = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); 
                 kelasSelect = kelasSelect.filter(k => arrKelasDiajar.includes(k.toUpperCase())); 
             }
             
+            // Build Dashboard Filter Buttons
+            const btnContainer = document.getElementById('dash-filter-buttons');
+            let btnHtml = `<button onclick="setDashFilter('Semua')" id="btn-filt-Semua" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white">SEMUA</button>`;
+            kelasSelect.forEach(k => { btnHtml += `<button onclick="setDashFilter('${k}')" id="btn-filt-${k}" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">${k}</button>`; });
+            if(btnContainer) btnContainer.innerHTML = btnHtml;
+            // Activate current filter visually
+            if(document.getElementById('btn-filt-'+activeDashFilter)) { document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); document.getElementById('btn-filt-'+activeDashFilter).className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; }
+
             ['filter-kelas-daftar', 'filter-kelas-input', 'filter-kelas-daftarnilai', 'pk-kelas'].forEach(id => {
                 const sel = document.getElementById(id);
                 if(sel) { 
@@ -901,8 +960,8 @@
             });
             
             const selManajemen = document.getElementById('filter-kelas-manajemen');
-            if(selManajemen && MASTER_DATA_SISWA.length > 0) { 
-                let kelasOpt = [...new Set(MASTER_DATA_SISWA.map(s => s.Kelas))]; 
+            if(selManajemen && MASTER_DATA_SISWA.length >= 0) { 
+                let kelasOpt = [...allClasses].sort();
                 if(SESSION_DATA.Role !== 'Admin') { if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { kelasOpt = [SESSION_DATA.Wali_Kelas]; } else { kelasOpt = []; } }
                 selManajemen.innerHTML = `<option value="Semua">Semua Kelas</option>`; kelasOpt.forEach(k => selManajemen.innerHTML += `<option value="${k}">${k}</option>`); 
             }
@@ -948,7 +1007,10 @@
             if(isSyncing) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-indigo-400 italic block md:table-cell"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Sedang memuat data dari server...</td></tr>`; return; }
                     
             const dataKelas = MASTER_DATA_SISWA.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
-            if(dataKelas.length === 0) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-red-400 italic block md:table-cell">Kelas kosong.</td></tr>`; return; }
+            if(dataKelas.length === 0) { 
+                tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-red-500 font-bold bg-red-50 dark:bg-red-900/20 italic block md:table-cell rounded-lg md:rounded-none"><i class="fa-solid fa-triangle-exclamation mr-2 text-xl"></i>Data siswa kosong. Silakan hubungi Wali Kelas terkait untuk menginput daftar siswa terlebih dahulu.</td></tr>`; 
+                return; 
+            }
             
             let tableName = cat; let existingGrades = ALL_NILAI_DATA[tableName] || [];
             if(tableName === "NilaiMapel" || tableName === "NilaiCP") existingGrades = existingGrades.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel);
@@ -1096,6 +1158,12 @@
 
             let targetData = (ALL_NILAI_DATA[catSelect] || []).filter(n => String(n.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if (SESSION_DATA.Role !== 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) { targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel); }
+            
+            // FILTER MAPEL KHUSUS ADMIN
+            if (SESSION_DATA.Role === 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) {
+                const adminMapelFilter = document.getElementById('pk-mapel-admin')?.value;
+                if (adminMapelFilter) { targetData = targetData.filter(n => n.Mata_Pelajaran === adminMapelFilter); }
+            }
 
             if (thInfo) { if (catSelect === "NilaiMapel" || catSelect === "NilaiCP") thInfo.innerText = "Mata Pelajaran"; else if (catSelect === "NilaiEkskul") thInfo.innerText = "Daftar Ekskul"; else if (catSelect === "NilaiKokurikuler") thInfo.innerText = "Kokurikuler"; else thInfo.innerText = "Kategori Sikap"; }
 
@@ -1115,7 +1183,7 @@
 
                     btnAction = `<div class="flex md:justify-center gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 md:flex-none bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-blue-200 dark:hover:bg-blue-800 transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit</button><button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-red-200 dark:hover:bg-red-800 transition shadow-sm"><i class="fa-solid fa-trash"></i></button></div>`;
                 } else {
-                    infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Mapel || "-") : "-"; nilaiCol = `<span class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">Belum dinilai</span>`;
+                    infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Role==='Admin' ? "-" : SESSION_DATA.Mapel || "-") : "-"; nilaiCol = `<span class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">Belum dinilai</span>`;
                 }
                 return `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0"><td class="px-3 md:px-4 py-2 md:py-4 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">NIS:</span> <span>${s.NIS}</span></td><td class="px-3 md:px-4 py-2 md:py-4 text-sm font-bold md:font-medium flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">Nama:</span> <span class="text-right">${s.Nama_Lengkap}</span></td><td class="px-3 md:px-4 py-2 md:py-4 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">Kategori:</span> <span class="text-right">${infoCol}</span></td><td class="px-3 md:px-4 py-2 md:py-4 md:text-center text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 self-center">Nilai:</span> <div>${nilaiCol}</div></td><td class="px-3 md:px-4 py-3 md:py-4 md:text-center flex flex-col md:table-cell mt-2 border-t border-gray-100 dark:border-gray-700 md:border-none md:mt-0">${btnAction}</td></tr>`;
             }).join('');
@@ -1174,6 +1242,22 @@
             if(SESSION_DATA.Role !== 'Admin') { if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { data = data.filter(s => String(s.Kelas).trim().toUpperCase() === String(SESSION_DATA.Wali_Kelas).trim().toUpperCase()); } else { data = []; } }
             if(k !== "Semua") data = data.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if(q) data = data.filter(s => s.Nama_Lengkap.toLowerCase().includes(q) || String(s.NIS).includes(q));
+            
+            // --- INFO WALI KELAS UNTUK ADMIN ---
+            const infoBox = document.getElementById('admin-info-walikelas');
+            if(SESSION_DATA.Role === 'Admin' && k !== "Semua") {
+                const wali = MASTER_DATA_PENGGUNA.find(g => g.Wali_Kelas && g.Wali_Kelas.toUpperCase() === k.toUpperCase());
+                document.getElementById('ai-kelas').innerText = `Kelas ${k}`;
+                const waliNameEl = document.getElementById('ai-wali').querySelector('span');
+                if(wali) { waliNameEl.innerText = wali.Nama_Lengkap; waliNameEl.classList.remove('text-red-500', 'italic'); } 
+                else { waliNameEl.innerText = "Belum Ada Wali Kelas Terdaftar"; waliNameEl.classList.add('text-red-500', 'italic'); }
+                document.getElementById('ai-L').innerText = data.filter(x=>x.Gender==='L').length;
+                document.getElementById('ai-P').innerText = data.filter(x=>x.Gender==='P').length;
+                document.getElementById('ai-total').innerText = data.length;
+                infoBox.classList.remove('hidden');
+            } else if(infoBox) { infoBox.classList.add('hidden'); }
+            // -----------------------------------
+
             if(data.length === 0){ tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Tidak ada data siswa.</td></tr>`; return; }
             tbody.innerHTML = data.map(s => {
                 const nisLama = s._nis_lama || s.NIS; const sStr = JSON.stringify(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
