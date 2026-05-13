@@ -52,7 +52,6 @@
         .synced { background-color: #22c55e; }
         .sync-error { background-color: #ef4444; }
         
-        /* Glassmorphism utility */
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .dark .glass { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); }
     </style>
@@ -61,6 +60,39 @@
 
     <!-- TOAST -->
     <div id="toast-container" class="fixed top-20 right-6 z-[90] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- MODAL PEMANTAUAN (BARU) -->
+    <div id="modal-pemantauan" class="fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-all duration-300" id="modal-pemantauan-content">
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-chart-pie mr-2"></i> Progress Penilaian</h3>
+                <button onclick="closeModalPemantauan()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <!-- Header Info -->
+                <div class="mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                    <h4 class="text-2xl font-extrabold text-gray-800 dark:text-white" id="pemantauan-title">INFORMATIKA</h4>
+                    <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1">Kelas Target: <span id="pemantauan-kelas" class="bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded text-xs ml-1">8E</span></p>
+                </div>
+
+                <!-- MAIN VIEW: Progress Bars -->
+                <div id="pemantauan-view-main" class="space-y-4">
+                    <!-- Template Progress Bar di-inject via JS -->
+                </div>
+
+                <!-- DETAIL VIEW: List Siswa -->
+                <div id="pemantauan-view-detail" class="hidden">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
+                        <h5 class="font-bold text-gray-800 dark:text-gray-200" id="pemantauan-detail-title">Belum Dinilai</h5>
+                        <button onclick="backToPemantauanMain()" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali</button>
+                    </div>
+                    <ul id="pemantauan-detail-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                        <!-- List Siswa -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL PREVIEW KOKU & CP -->
     <div id="modal-preview-koku" class="fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
@@ -260,6 +292,7 @@
                     <div class="mb-5"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3"><i class="fa-solid fa-filter mr-1"></i> Filter Data Dashboard:</p><div id="dash-filter-buttons" class="flex flex-wrap gap-2"></div></div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Box Statistik Siswa -->
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 relative overflow-hidden group hover:shadow-md transition">
                             <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500"></div>
                             <div class="flex justify-between items-start mb-6">
@@ -271,11 +304,36 @@
                                 <div class="text-center bg-pink-50 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/30 py-3 rounded-xl"><p class="text-xs font-bold text-pink-500 dark:text-pink-400 uppercase mb-1"><i class="fa-solid fa-venus mr-1"></i> Perempuan</p><p class="text-2xl font-bold text-pink-700 dark:text-pink-300" id="dash-P">0</p></div>
                             </div>
                         </div>
-                        <div id="box-pemantauan-wali" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-yellow-200 dark:border-yellow-700/50 p-6 relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-500"></div>
-                            <h4 class="font-bold text-yellow-800 dark:text-yellow-500 mb-2 uppercase text-sm"><i class="fa-solid fa-clipboard-check mr-2 text-lg"></i> Pemantauan Mapel Guru</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">Status Mapel Kelas Perwalian (<span id="wali-kelas-tag" class="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"></span>)</p>
-                            <div id="list-mapel-wali" class="grid grid-cols-2 gap-3 mt-2"></div>
+
+                        <!-- Info Kelas Ajar -->
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 relative overflow-hidden group hover:shadow-md transition">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500"></div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Informasi Ajar</p><h4 class="text-xl font-bold text-gray-800 dark:text-white" id="info-mapel-dashboard">-</h4></div>
+                                <div class="text-blue-100 dark:text-blue-400 text-3xl bg-blue-50 dark:bg-blue-900/30 w-12 h-12 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition duration-300"><i class="fa-solid fa-book-open text-blue-500 dark:text-blue-400"></i></div>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Seluruh Kelas Ajar:</p>
+                                <div id="info-kelas-dashboard" class="flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOX PEMANTAUAN (BARU) -->
+                    <div id="box-pemantauan" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-yellow-200 dark:border-yellow-700/50 p-6 relative overflow-hidden hidden animate-fade-in mb-6">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-500"></div>
+                        <h4 class="font-extrabold text-yellow-800 dark:text-yellow-500 mb-6 uppercase text-sm flex items-center tracking-wide"><i class="fa-solid fa-clipboard-check mr-2 text-xl"></i> Pemantauan Progress Penilaian</h4>
+                        
+                        <!-- List Mapel Sendiri -->
+                        <div id="container-pemantauan-mapel" class="mb-6 hidden">
+                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">MATA PELAJARAN SAYA</p>
+                            <div id="list-pemantauan-mapel" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+                        </div>
+
+                        <!-- List Mapel Wali Kelas -->
+                        <div id="container-pemantauan-wali" class="hidden mt-2">
+                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">KELAS PERWALIAN (<span id="label-wali-kelas" class="text-indigo-600 dark:text-indigo-400"></span>)</p>
+                            <div id="list-pemantauan-wali" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
                         </div>
                     </div>
                 </section>
@@ -671,6 +729,17 @@
             document.getElementById('ui-nama-guru').innerText = SESSION_DATA.Nama_Lengkap; document.getElementById('prof-nama').innerText = SESSION_DATA.Nama_Lengkap; document.getElementById('prof-role').innerText = SESSION_DATA.Role; document.getElementById('prof-wali').innerText = SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-" ? SESSION_DATA.Wali_Kelas : "Bukan"; document.getElementById('prof-mapel').innerText = SESSION_DATA.Mapel === "-" ? "-" : SESSION_DATA.Mapel; document.getElementById('prof-kelas').innerText = SESSION_DATA.Kelas_Diajar === "-" ? "-" : SESSION_DATA.Kelas_Diajar.replace(/,/g, ', ');
             let rText = SESSION_DATA.Role; if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") rText += ` (Wali ${SESSION_DATA.Wali_Kelas})`; document.getElementById('ui-role').innerText = rText;
 
+            // Update UI Kelas Ajar Baru (Dashboard)
+            if(SESSION_DATA.Role !== 'Admin') {
+                document.getElementById('info-mapel-dashboard').innerText = SESSION_DATA.Mapel;
+                const infoContainer = document.getElementById('info-kelas-dashboard');
+                if(SESSION_DATA.Kelas_Diajar !== "-") {
+                    infoContainer.innerHTML = SESSION_DATA.Kelas_Diajar.split(',').map(k => `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-bold border border-gray-200 dark:border-gray-600 shadow-sm">${k.trim()}</span>`).join('');
+                } else {
+                    infoContainer.innerHTML = `<span class="text-xs text-gray-400 italic">Belum ada kelas ajar.</span>`;
+                }
+            }
+
             const btnContainer = document.getElementById('dash-filter-buttons'); let arrKelas = [];
             
             if(SESSION_DATA.Role === 'Admin') { 
@@ -694,8 +763,7 @@
             let btnHtml = `<button onclick="setDashFilter('Semua')" id="btn-filt-Semua" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white">SEMUA</button>`;
             arrKelas.forEach(k => { btnHtml += `<button onclick="setDashFilter('${k}')" id="btn-filt-${k}" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">${k}</button>`; });
             btnContainer.innerHTML = btnHtml;
-            if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { document.getElementById('box-pemantauan-wali').classList.remove('hidden'); document.getElementById('wali-kelas-tag').innerText = SESSION_DATA.Wali_Kelas; } else { document.getElementById('box-pemantauan-wali').classList.add('hidden'); }
-
+            
             manualSync(); if(autoSyncTimer) clearInterval(autoSyncTimer); autoSyncTimer = setInterval(() => { if (!isSyncing) silentSync(); }, 60000);
         }
 
@@ -703,7 +771,6 @@
             if (isSyncing) return;
             isSyncing = true; setSyncStatus('syncing');
             try {
-                // PENAMBAHAN SHEET NilaICP
                 const sheetNames = ["DataSiswa","DataPengguna","NilaiMapel","NilaiEkskul","NilaiSikap","NilaiKokurikuler","NilaiCP"];
                 const results = await Promise.all(sheetNames.map(name => fetchFromGoogle("readAll",null,null,name)));
                 const allOk = results.every(r => r && r.status==='success');
@@ -723,16 +790,181 @@
         function setDashFilter(k) { activeDashFilter = k; document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); const activeBtn = document.getElementById('btn-filt-'+k); if(activeBtn) activeBtn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; updateDashboardAndData(); }
         function getSiswaDiajarDashboard() { let data = MASTER_DATA_SISWA; if(SESSION_DATA.Role !== 'Admin') { const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); data = data.filter(s => arr.includes(String(s.Kelas).trim().toUpperCase())); } if(activeDashFilter !== "Semua") data = data.filter(s => String(s.Kelas).trim().toUpperCase() === activeDashFilter); return data; }
 
+        function generatePemantauanCard(kelas, mapel) {
+            const currentSiswa = MASTER_DATA_SISWA.filter(s => s.Kelas.trim().toUpperCase() === kelas.toUpperCase());
+            const total = currentSiswa.length;
+
+            if (total === 0) return `<div class="bg-gray-100 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 opacity-50 flex flex-col items-center justify-center gap-1 min-h-[90px]"><span class="text-xs font-bold text-gray-400 text-center">${mapel}</span><span class="text-[10px] font-semibold text-gray-400 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">${kelas} (Kosong)</span></div>`;
+
+            const gradedMapelNIS = (ALL_NILAI_DATA['NilaiMapel'] || []).filter(n => n.Kelas.trim().toUpperCase() === kelas.toUpperCase() && n.Mata_Pelajaran.trim().toUpperCase() === mapel.toUpperCase()).map(n => String(n.NIS).trim());
+            const blmMapel = currentSiswa.filter(s => !gradedMapelNIS.includes(String(s.NIS).trim())).length;
+
+            const gradedCPNIS = (ALL_NILAI_DATA['NilaiCP'] || []).filter(n => n.Kelas.trim().toUpperCase() === kelas.toUpperCase() && n.Mata_Pelajaran.trim().toUpperCase() === mapel.toUpperCase()).map(n => String(n.NIS).trim());
+            const blmCP = currentSiswa.filter(s => !gradedCPNIS.includes(String(s.NIS).trim())).length;
+
+            const isComplete = (blmMapel === 0 && blmCP === 0);
+
+            if (isComplete) {
+                return `
+                <div onclick="bukaModalPemantauan('${kelas}', '${mapel}')" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 cursor-pointer hover:shadow-md transition text-center flex flex-col items-center justify-center gap-1.5 min-h-[90px]">
+                    <i class="fa-solid fa-circle-check text-green-500 dark:text-green-400 text-2xl mb-0.5"></i>
+                    <span class="text-xs font-extrabold text-green-700 dark:text-green-400 leading-tight">${mapel}</span>
+                    <span class="text-[10px] font-semibold text-green-600 dark:text-green-500 bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full">${kelas}</span>
+                </div>`;
+            } else {
+                return `
+                <div onclick="bukaModalPemantauan('${kelas}', '${mapel}')" class="bg-slate-700 dark:bg-slate-800 border border-slate-600 rounded-xl p-3 cursor-pointer hover:shadow-md transition text-center flex flex-col items-center justify-center gap-1.5 shadow-inner min-h-[90px]">
+                    <i class="fa-solid fa-clock text-slate-300 text-2xl mb-0.5 opacity-80"></i>
+                    <span class="text-xs font-extrabold text-white leading-tight">${mapel}</span>
+                    <span class="text-[10px] font-semibold text-slate-300 bg-slate-600 px-2 py-0.5 rounded-full">${kelas}</span>
+                </div>`;
+            }
+        }
+
+        // --- Logic Buka Pemantauan ---
+        let tempPemantauanData = {};
+
+        function bukaModalPemantauan(kelas, mapel) {
+            document.getElementById('pemantauan-title').innerText = mapel.toUpperCase();
+            document.getElementById('pemantauan-kelas').innerText = kelas.toUpperCase();
+
+            const currentSiswa = MASTER_DATA_SISWA.filter(s => s.Kelas.trim().toUpperCase() === kelas.toUpperCase());
+            const total = currentSiswa.length;
+
+            const gradedMapelNIS = (ALL_NILAI_DATA['NilaiMapel'] || []).filter(n => n.Kelas.trim().toUpperCase() === kelas.toUpperCase() && n.Mata_Pelajaran.trim().toUpperCase() === mapel.toUpperCase()).map(n => String(n.NIS).trim());
+            const belumMapel = currentSiswa.filter(s => !gradedMapelNIS.includes(String(s.NIS).trim()));
+            const pctMapel = total === 0 ? 0 : Math.round(((total - belumMapel.length) / total) * 100);
+
+            const gradedCPNIS = (ALL_NILAI_DATA['NilaiCP'] || []).filter(n => n.Kelas.trim().toUpperCase() === kelas.toUpperCase() && n.Mata_Pelajaran.trim().toUpperCase() === mapel.toUpperCase()).map(n => String(n.NIS).trim());
+            const belumCP = currentSiswa.filter(s => !gradedCPNIS.includes(String(s.NIS).trim()));
+            const pctCP = total === 0 ? 0 : Math.round(((total - belumCP.length) / total) * 100);
+
+            tempPemantauanData = {
+                'Nilai Akhir Mapel': belumMapel,
+                'Capaian Kompetensi (CP)': belumCP
+            };
+
+            const html = `
+                ${renderProgressBar('Nilai Akhir Mapel', total - belumMapel.length, total, pctMapel, 'Nilai Akhir Mapel')}
+                ${renderProgressBar('Capaian Kompetensi (CP)', total - belumCP.length, total, pctCP, 'Capaian Kompetensi (CP)')}
+            `;
+
+            document.getElementById('pemantauan-view-main').innerHTML = html;
+            backToPemantauanMain();
+
+            const modal = document.getElementById('modal-pemantauan');
+            const content = document.getElementById('modal-pemantauan-content');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => content.classList.remove('scale-95'), 10);
+        }
+
+        function renderProgressBar(label, seles, tot, pct, catKey) {
+            let color = pct === 100 ? 'bg-green-500' : 'bg-yellow-500';
+            let isDone = pct === 100;
+            let btnDetail = isDone ? `<span class="text-xs font-bold text-green-500 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-check mr-1"></i> Tuntas</span>` : `<button onclick="lihatDetailPemantauan('${catKey}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm">Lihat Belum (${tot-seles})</button>`;
+
+            return `
+            <div class="bg-gray-50 dark:bg-gray-900/50 p-4 md:p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h5 class="font-bold text-gray-800 dark:text-gray-200 text-sm md:text-base">${label}</h5>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-semibold mt-0.5">${seles} / ${tot} Siswa Selesai</p>
+                    </div>
+                    ${btnDetail}
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-1 overflow-hidden">
+                    <div class="${color} h-3 rounded-full transition-all duration-500 shadow-inner" style="width: ${pct}%"></div>
+                </div>
+            </div>`;
+        }
+
+        function lihatDetailPemantauan(kategori) {
+            const blmList = tempPemantauanData[kategori] || [];
+            document.getElementById('pemantauan-detail-title').innerText = `Belum Dinilai: ${kategori}`;
+            
+            const listContainer = document.getElementById('pemantauan-detail-list');
+            if(blmList.length === 0) {
+                listContainer.innerHTML = `<p class="text-center text-sm text-gray-400 py-4 italic">Semua siswa sudah dinilai.</p>`;
+            } else {
+                listContainer.innerHTML = blmList.map(s => `
+                    <li class="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:shadow transition">
+                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 flex items-center justify-center font-bold text-sm shadow-inner">${s.No_Absen}</div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-gray-800 dark:text-gray-200 leading-tight">${s.Nama_Lengkap}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">NIS: ${s.NIS}</p>
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            document.getElementById('pemantauan-view-main').classList.add('hidden');
+            document.getElementById('pemantauan-view-detail').classList.remove('hidden');
+            document.getElementById('pemantauan-view-detail').classList.add('animate-fade-in');
+        }
+
+        function backToPemantauanMain() {
+            document.getElementById('pemantauan-view-detail').classList.add('hidden');
+            document.getElementById('pemantauan-view-main').classList.remove('hidden');
+        }
+
+        function closeModalPemantauan() {
+            const modal = document.getElementById('modal-pemantauan');
+            const content = document.getElementById('modal-pemantauan-content');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
+        }
+
         function updateDashboardAndData() {
             const dataFiltered = getSiswaDiajarDashboard();
             document.getElementById('dash-total-siswa').innerText = dataFiltered.length; document.getElementById('dash-L').innerText = dataFiltered.filter(s => s.Gender === 'L').length; document.getElementById('dash-P').innerText = dataFiltered.filter(s => s.Gender === 'P').length;
 
-            if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") {
-                const listContainer = document.getElementById('list-mapel-wali'); const kelasWali = SESSION_DATA.Wali_Kelas.toUpperCase(); let mapelWajib = [];
-                MASTER_DATA_PENGGUNA.forEach(g => { if(g.Role !== 'Admin' && g.Mapel !== "-" && g.Kelas_Diajar.toUpperCase().includes(kelasWali)) mapelWajib.push(g.Mapel.toUpperCase()); });
-                if([...new Set(mapelWajib)].length === 0) listContainer.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2">Belum ada Guru Mapel terdaftar di kelas ini.</p>`;
-                else listContainer.innerHTML = [...new Set(mapelWajib)].map(m => `<div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase flex flex-col gap-1.5 shadow-sm"><i class="fa-solid fa-clock text-gray-400 dark:text-gray-500 text-lg"></i> ${m}</div>`).join('');
+            // --- LOGIC BARU PEMANTAUAN ---
+            const boxPemantauan = document.getElementById('box-pemantauan');
+            const contMapel = document.getElementById('container-pemantauan-mapel');
+            const listMapel = document.getElementById('list-pemantauan-mapel');
+            const contWali = document.getElementById('container-pemantauan-wali');
+            const listWali = document.getElementById('list-pemantauan-wali');
+
+            if(SESSION_DATA.Role !== 'Admin') {
+                boxPemantauan.classList.remove('hidden');
+
+                // 1. MAPEL SAYA (Diakses oleh Guru Mapel)
+                if(SESSION_DATA.Kelas_Diajar !== "-") {
+                    contMapel.classList.remove('hidden');
+                    let mapelHtml = '';
+                    let arrKls = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase());
+                    arrKls.forEach(kls => {
+                        mapelHtml += generatePemantauanCard(kls, SESSION_DATA.Mapel);
+                    });
+                    listMapel.innerHTML = mapelHtml;
+                } else {
+                    contMapel.classList.add('hidden');
+                }
+
+                // 2. KELAS PERWALIAN (Diakses oleh Wali Kelas)
+                if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") {
+                    contWali.classList.remove('hidden');
+                    document.getElementById('label-wali-kelas').innerText = SESSION_DATA.Wali_Kelas;
+                    let klsWali = SESSION_DATA.Wali_Kelas.toUpperCase();
+                    let mapelWaliHtml = '';
+                    let mapelWajib = [];
+                    MASTER_DATA_PENGGUNA.forEach(g => {
+                        if(g.Role !== 'Admin' && g.Mapel !== "-" && g.Kelas_Diajar.toUpperCase().includes(klsWali)) {
+                            mapelWajib.push(g.Mapel.toUpperCase());
+                        }
+                    });
+                    [...new Set(mapelWajib)].forEach(mpl => {
+                        mapelWaliHtml += generatePemantauanCard(klsWali, mpl);
+                    });
+                    if(mapelWaliHtml === '') mapelWaliHtml = `<p class="text-xs text-gray-400 italic col-span-2">Belum ada Guru Mapel terdaftar di kelas ini.</p>`;
+                    listWali.innerHTML = mapelWaliHtml;
+                } else {
+                    contWali.classList.add('hidden');
+                }
+            } else {
+                boxPemantauan.classList.add('hidden');
             }
+            // -----------------------------
 
             let kelasSelect = [...new Set(MASTER_DATA_SISWA.map(s => s.Kelas))];
             let arrKelasDiajar = [];
@@ -794,11 +1026,9 @@
             
             if(type === 'manual') { 
                 btnMan.className = btnOn; btnExc.className = btnOff; areaMan.classList.remove('hidden'); areaExc.classList.add('hidden'); 
-                // PENAMBAHAN MENU CP HANYA UNTUK MANUAL
                 catSelect.innerHTML = `<option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiCP">Nilai Capaian Kompetensi (CP)</option><option value="NilaiEkskul">Ekstrakurikuler</option><option value="NilaiKokurikuler">Kokurikuler</option><option value="NilaiSikap">Sikap / BK</option>`;
             } else { 
                 btnExc.className = btnOn; btnMan.className = btnOff; areaExc.classList.remove('hidden'); areaMan.classList.add('hidden'); 
-                // MENU EXCEL TETAP SAMA
                 catSelect.innerHTML = `<option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiSikap">Nilai Sikap / BK</option>`;
             }
             renderInputNilai();
@@ -832,7 +1062,6 @@
             let tableName = cat;
             let existingGrades = ALL_NILAI_DATA[tableName] || [];
             
-            // CP juga dicek berdasarkan Mapel
             if(tableName === "NilaiMapel" || tableName === "NilaiCP") existingGrades = existingGrades.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel);
             
             const gradedNIS = existingGrades.map(n => String(n.NIS).trim());
@@ -847,12 +1076,11 @@
             if(cat === "NilaiEkskul") placeholderText = "Pramuka:A, Tari:B"; 
             else if(cat === "NilaiSikap") placeholderText = "A/B/C/D"; 
             else if(cat === "NilaiKokurikuler") placeholderText = "Teks deskripsi singkat...";
-            else if(cat === "NilaiCP") placeholderText = "Tulis Capaian Kompetensi..."; // Placeholder CP
+            else if(cat === "NilaiCP") placeholderText = "Tulis Capaian Kompetensi..."; 
             
             tbody.innerHTML = dataBelumDinilai.map((s, idx) => {
                 let inputField = `<input type="text" class="w-full text-base md:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-bold val-input-nilai outline-none transition dark:text-white" placeholder="${placeholderText}">`;
 
-                // Logika TEXTAREA untuk CP & Kokurikuler (Melebar Otomatis)
                 if(cat === "NilaiCP" || cat === "NilaiKokurikuler") {
                     inputField = `<textarea class="w-full text-base md:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-bold val-input-nilai outline-none transition dark:text-white resize-none overflow-hidden" rows="2" placeholder="${placeholderText}" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>`;
                 }
@@ -877,7 +1105,6 @@
             if(kategori === "NilaiMapel") { const num = Number(val); if(!/^\d+$/.test(val) || isNaN(num) || num < 1 || num > 100) return "Wajib angka 1-100"; } 
             else if(kategori === "NilaiSikap") { if(!['A','B','C','D'].includes(val.toUpperCase())) return "Wajib huruf A/B/C/D"; }
             else if(kategori === "NilaiEkskul") { const regex = /^([^:]+:[A-D])(,\s*[^:]+:[A-D])*$/i; if(!regex.test(val)) return "Format salah. Cth: Pramuka:A, Tari:B"; }
-            // NilaiCP & NilaiKokurikuler lolos asal tidak kosong
             return "valid";
         }
 
@@ -907,7 +1134,7 @@
                 let obj = { NIS: nis, Nama_Siswa: nama, Kelas: kelas };
                 
                 if(tableName==="NilaiMapel") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Nilai_Akhir = val; }
-                else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } // SIMPAN DATA CP
+                else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } 
                 else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; 
                 else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); 
                 else obj.Keterangan_Kokurikuler = val;
@@ -1013,10 +1240,10 @@
             tbody.innerHTML = targetData.map(n => {
                 let infoCol = "-", nilaiCol = "-";
                 if(catSelect === "NilaiMapel") { infoCol = n.Mata_Pelajaran; nilaiCol = `<span class="font-bold text-indigo-700 dark:text-indigo-400 text-lg md:text-base">${n.Nilai_Akhir}</span>`; }
-                else if(catSelect === "NilaiCP") { infoCol = n.Mata_Pelajaran; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Deskripsi_CP||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"><i class="fa-solid fa-eye"></i> Lihat CP</button>`; }
+                else if(catSelect === "NilaiCP") { infoCol = n.Mata_Pelajaran; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Deskripsi_CP||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm"><i class="fa-solid fa-eye"></i> Lihat CP</button>`; }
                 else if(catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = n.Data_Ekskul.split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm"><b>${parts[0].trim()}</b>: ${parts[1]?.trim()}</span>`; }); nilaiCol = ekskulArray.join(''); }
                 else if(catSelect === "NilaiSikap") { infoCol = "Predikat"; nilaiCol = `<span class="font-bold text-green-600 dark:text-green-400 text-lg md:text-base">${n.Predikat_Sikap}</span>`; }
-                else if(catSelect === "NilaiKokurikuler") { infoCol = "Sudah Diisi"; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Keterangan_Kokurikuler||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"><i class="fa-solid fa-eye"></i> Lihat Preview</button>`; }
+                else if(catSelect === "NilaiKokurikuler") { infoCol = "Sudah Diisi"; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Keterangan_Kokurikuler||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm"><i class="fa-solid fa-eye"></i> Lihat Preview</button>`; }
                 
                 return `
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0">
@@ -1069,10 +1296,10 @@
 
                 if (gradeRecord) {
                     if (catSelect === "NilaiMapel") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Nilai_Akhir}</span>`; } 
-                    else if (catSelect === "NilaiCP") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = "Teks CP Tersimpan"; } 
+                    else if (catSelect === "NilaiCP") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded">Teks CP Tersimpan</span>`; } 
                     else if (catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = (gradeRecord.Data_Ekskul || "").split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm">${parts[0].trim()}: <b>${parts[1]?.trim()}</b></span>`; }); nilaiCol = ekskulArray.join(''); } 
                     else if (catSelect === "NilaiSikap") { infoCol = "Sikap"; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Predikat_Sikap}</span>`; } 
-                    else if (catSelect === "NilaiKokurikuler") { infoCol = "Kokurikuler"; nilaiCol = "Teks Tersimpan"; }
+                    else if (catSelect === "NilaiKokurikuler") { infoCol = "Kokurikuler"; nilaiCol = `<span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded">Teks Tersimpan</span>`; }
 
                     const mapelParam = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? gradeRecord.Mata_Pelajaran : "-";
                     const rawVal = (catSelect === "NilaiMapel") ? gradeRecord.Nilai_Akhir : (catSelect === "NilaiEkskul") ? gradeRecord.Data_Ekskul : (catSelect === "NilaiSikap") ? gradeRecord.Predikat_Sikap : (catSelect === "NilaiCP") ? gradeRecord.Deskripsi_CP : gradeRecord.Keterangan_Kokurikuler;
@@ -1080,8 +1307,8 @@
                     const safeName = s.Nama_Lengkap.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     const safeRawVal = String(rawVal || "").replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 
-                    btnAction = `<div class="flex md:justify-center gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 md:flex-none bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-blue-200 dark:hover:bg-blue-800 transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
-                                 <button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-red-200 dark:hover:bg-red-800 transition"><i class="fa-solid fa-trash"></i></button></div>`;
+                    btnAction = `<div class="flex md:justify-center gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 md:flex-none bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-blue-200 dark:hover:bg-blue-800 transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                                 <button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-red-200 dark:hover:bg-red-800 transition shadow-sm"><i class="fa-solid fa-trash"></i></button></div>`;
                 } else {
                     infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Mapel || "-") : "-";
                     nilaiCol = `<span class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">Belum dinilai</span>`;
@@ -1106,7 +1333,6 @@
             const lblVal = document.getElementById('label-input-edit-nilai'); 
             const panduan = document.getElementById('panduan-edit-nilai');
             
-            // Switch antara input biasa dan textarea
             if(catSelect === "NilaiCP" || catSelect === "NilaiKokurikuler") {
                 inputVal.classList.add('hidden');
                 areaVal.classList.remove('hidden');
@@ -1136,7 +1362,6 @@
             e.preventDefault();
             const nis = document.getElementById('edit-nilai-nis').value; const nama = document.getElementById('edit-nilai-nama').value; const kelas = document.getElementById('edit-nilai-kelas').value; const cat = document.getElementById('edit-nilai-kategori').value; const mapel = document.getElementById('edit-nilai-mapel').value; 
             
-            // Tangkap dari form yang sedang aktif
             const val = (cat === "NilaiCP" || cat === "NilaiKokurikuler") ? document.getElementById('edit-nilai-val-area').value : document.getElementById('edit-nilai-val').value;
             
             const valRes = checkNilaiRule(val, cat); if(valRes !== "valid") { showToast(valRes, 'warning'); return; }
