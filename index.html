@@ -16,24 +16,16 @@
                         indigo: { 900: '#1e1b4b', 800: '#3730a3', 700: '#4338ca', 600: '#4f46e5', 500: '#6366f1' }
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
                         'slide-up': 'slideUp 0.4s ease-out forwards',
-                        'pulse-yellow': 'pulseYellow 1.5s infinite'
+                        'pulse-yellow': 'pulseYellow 1.5s infinite',
+                        'bounce-soft': 'bounceSoft 2s infinite'
                     },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(15px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        pulseYellow: {
-                            '0%': { boxShadow: '0 0 0 0 rgba(234, 179, 8, 0.7)' },
-                            '70%': { boxShadow: '0 0 0 6px rgba(234, 179, 8, 0)' },
-                            '100%': { boxShadow: '0 0 0 0 rgba(234, 179, 8, 0)' }
-                        }
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(15px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        pulseYellow: { '0%': { boxShadow: '0 0 0 0 rgba(234, 179, 8, 0.7)' }, '70%': { boxShadow: '0 0 0 6px rgba(234, 179, 8, 0)' }, '100%': { boxShadow: '0 0 0 0 rgba(234, 179, 8, 0)' } },
+                        bounceSoft: { '0%, 100%': { transform: 'translateY(-5%)' }, '50%': { transform: 'translateY(0)' } }
                     }
                 }
             }
@@ -50,7 +42,6 @@
         .syncing { background-color: #eab308; animation: pulseYellow 1.5s infinite; }
         .synced { background-color: #22c55e; }
         .sync-error { background-color: #ef4444; }
-        
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .dark .glass { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -58,19 +49,18 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 flex h-screen overflow-hidden text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300" onclick="closeProfileMenu(event)">
 
-    <!-- TOAST -->
+    <!-- TOAST & FLOATING BADGE -->
     <div id="toast-container" class="fixed top-20 right-6 z-[90] flex flex-col gap-3 pointer-events-none"></div>
+    <div id="badge-update-tersedia" onclick="applySoftSync()" class="fixed bottom-6 right-6 z-[85] bg-indigo-600 text-white px-5 py-3 rounded-full shadow-2xl cursor-pointer hover:bg-indigo-700 transition transform translate-y-20 opacity-0 flex items-center gap-3 font-bold animate-bounce-soft">
+        <i class="fa-solid fa-arrows-rotate animate-spin-slow"></i> Terdapat Data Baru! Klik untuk Muat Ulang
+    </div>
 
     <!-- MODAL SETUP WIZARD (FIRST TIME ADMIN) -->
     <div id="modal-setup-wizard" class="fixed inset-0 z-[100] bg-indigo-900/95 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden animate-slide-up flex flex-col max-h-[95vh] border border-white/20">
             <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-6 md:p-8 text-white text-center relative overflow-hidden">
-                <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-                    <i class="fa-solid fa-school text-[150px]"></i>
-                </div>
-                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm shadow-inner relative z-10">
-                    <i class="fa-solid fa-school text-3xl"></i>
-                </div>
+                <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4"><i class="fa-solid fa-school text-[150px]"></i></div>
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm shadow-inner relative z-10"><i class="fa-solid fa-school text-3xl"></i></div>
                 <h3 class="font-extrabold text-2xl md:text-3xl relative z-10">Selamat Datang di E-Raport!</h3>
                 <p class="text-indigo-100 text-sm mt-2 relative z-10 font-medium">Sebagai Admin pertama, mari lengkapi Profil Sekolah sebagai template dasar Cetak Raport.</p>
             </div>
@@ -82,7 +72,6 @@
                         <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Alamat Lengkap</label><textarea id="wiz-alamat" required rows="2" placeholder="Jalan Raya Puputan..." class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none resize-none transition"></textarea></div>
                     </div>
                 </div>
-
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-user-tie mr-1"></i> Pimpinan Sekolah</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -90,7 +79,6 @@
                         <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">NIP Kepala Sekolah</label><input type="text" id="wiz-nip" placeholder="Isi '-' jika tidak ada" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
                     </div>
                 </div>
-
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-calendar-days mr-1"></i> Periode Akademik (Cetak)</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -100,7 +88,6 @@
                         <div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Raport</label><input type="text" id="wiz-tgl" required placeholder="Cth: 15 Des 2025" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div>
                     </div>
                 </div>
-
                 <div class="pt-6 border-t border-gray-100 dark:border-gray-700">
                     <button type="submit" id="btn-wizard-submit" class="w-full bg-indigo-600 text-white text-lg font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition">Simpan & Mulai Gunakan Aplikasi <i class="fa-solid fa-arrow-right ml-2"></i></button>
                 </div>
@@ -108,7 +95,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIRM PASSWORD (PENGATURAN) -->
+    <!-- MODAL CONFIRM PASSWORD -->
     <div id="modal-confirm-pass" class="fixed inset-0 z-[80] bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-all duration-300 animate-slide-up">
             <div class="p-6 md:p-8 text-center">
@@ -117,10 +104,7 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Masukkan password admin Anda untuk menyimpan perubahan Profil Sekolah.</p>
                 <form onsubmit="submitConfirmPass(event)">
                     <input type="password" id="conf-password" required placeholder="Password Admin..." class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3.5 focus:ring-2 focus:ring-indigo-500 outline-none text-center tracking-widest font-bold mb-4 transition">
-                    <div class="flex gap-2">
-                        <button type="button" onclick="closeConfirmPass()" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3.5 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">Batal</button>
-                        <button type="submit" class="flex-1 bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition">Verifikasi</button>
-                    </div>
+                    <div class="flex gap-2"><button type="button" onclick="closeConfirmPass()" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3.5 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">Batal</button><button type="submit" class="flex-1 bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition">Verifikasi</button></div>
                 </form>
             </div>
         </div>
@@ -129,21 +113,12 @@
     <!-- MODAL PEMANTAUAN -->
     <div id="modal-pemantauan" class="fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-all duration-300" id="modal-pemantauan-content">
-            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-chart-pie mr-2"></i> Progress Penilaian</h3>
-                <button onclick="closeModalPemantauan()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button>
-            </div>
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-chart-pie mr-2"></i> Progress Penilaian</h3><button onclick="closeModalPemantauan()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
             <div class="p-6">
-                <div class="mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
-                    <h4 class="text-2xl font-extrabold text-gray-800 dark:text-white" id="pemantauan-title">INFORMATIKA</h4>
-                    <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1">Kelas Target: <span id="pemantauan-kelas" class="bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded text-xs ml-1">8E</span></p>
-                </div>
+                <div class="mb-6 border-b border-gray-100 dark:border-gray-700 pb-4"><h4 class="text-2xl font-extrabold text-gray-800 dark:text-white" id="pemantauan-title">-</h4><p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1">Kelas Target: <span id="pemantauan-kelas" class="bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded text-xs ml-1">-</span></p></div>
                 <div id="pemantauan-view-main" class="space-y-4"></div>
                 <div id="pemantauan-view-detail" class="hidden">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-                        <h5 class="font-bold text-gray-800 dark:text-gray-200" id="pemantauan-detail-title">Belum Dinilai</h5>
-                        <button onclick="backToPemantauanMain()" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali</button>
-                    </div>
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-700 pb-3"><h5 class="font-bold text-gray-800 dark:text-gray-200" id="pemantauan-detail-title">Belum Dinilai</h5><button onclick="backToPemantauanMain()" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali</button></div>
                     <ul id="pemantauan-detail-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></ul>
                 </div>
             </div>
@@ -156,8 +131,7 @@
             <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-eye mr-2"></i> Preview Teks</h3><button onclick="closeModalKoku()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
             <div class="p-6">
                 <p class="text-xs font-bold text-gray-400 uppercase mb-1">Nama Siswa</p><p class="text-lg font-bold text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2 mb-4" id="koku-nama-siswa">-</p>
-                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Isi Deskripsi</p>
-                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 leading-relaxed min-h-[100px] whitespace-pre-wrap shadow-inner" id="koku-teks-deskripsi">-</div>
+                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Isi Deskripsi</p><div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 leading-relaxed min-h-[100px] whitespace-pre-wrap shadow-inner" id="koku-teks-deskripsi">-</div>
                 <div class="mt-6 flex justify-end"><button onclick="closeModalKoku()" class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition shadow">Tutup Preview</button></div>
             </div>
         </div>
@@ -169,15 +143,9 @@
             <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-user-pen mr-2"></i> Edit Data Siswa (Lokal)</h3><button onclick="closeModalEdit()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
             <form id="form-edit-siswa" onsubmit="submitEditSiswaLocal(event)" class="p-6 space-y-4">
                 <input type="hidden" id="edit-nis-lama">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">No. Absen</label><input type="number" id="edit-noabsen" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">NIS</label><input type="text" id="edit-nis" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">No. Absen</label><input type="number" id="edit-noabsen" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">NIS</label><input type="text" id="edit-nis" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div></div>
                 <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Nama Lengkap</label><input type="text" id="edit-nama" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Kelas</label><input type="text" id="edit-kelas" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 uppercase focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Gender</label><select id="edit-gender" class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select></div>
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Kelas</label><input type="text" id="edit-kelas" required class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 uppercase focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Gender</label><select id="edit-gender" class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg p-2.5 mt-1 focus:ring-2 focus:ring-indigo-500 outline-none transition"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select></div></div>
                 <div class="pt-4 flex justify-end gap-3"><button type="button" onclick="closeModalEdit()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition shadow">Batal</button><button type="submit" class="px-5 py-2.5 bg-yellow-500 text-white font-bold rounded-lg shadow-lg hover:bg-yellow-600 transition">Simpan Lokal</button></div>
             </form>
         </div>
@@ -188,28 +156,23 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-all duration-300" id="modal-edit-nilai-content">
             <div class="bg-yellow-500 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-pen-to-square mr-2"></i> Edit Nilai Siswa</h3><button onclick="closeModalEditNilai()" class="text-white hover:text-yellow-900 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
             <form id="form-edit-nilai" onsubmit="submitEditNilaiServer(event)" class="p-6 space-y-4">
-                <input type="hidden" id="edit-nilai-kategori">
-                <input type="hidden" id="edit-nilai-mapel">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">NIS</label><input type="text" id="edit-nilai-nis" readonly class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border rounded-lg p-2 mt-1 outline-none"></div>
-                    <div><label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</label><input type="text" id="edit-nilai-kelas" readonly class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border rounded-lg p-2 mt-1 outline-none"></div>
-                </div>
+                <input type="hidden" id="edit-nilai-kategori"><input type="hidden" id="edit-nilai-mapel">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">NIS</label><input type="text" id="edit-nilai-nis" readonly class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border rounded-lg p-2 mt-1 outline-none"></div><div><label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</label><input type="text" id="edit-nilai-kelas" readonly class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border rounded-lg p-2 mt-1 outline-none"></div></div>
                 <div><label class="block text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap</label><input type="text" id="edit-nilai-nama" readonly class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border rounded-lg p-2 mt-1 outline-none font-bold"></div>
-                
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
                     <label class="block text-sm font-bold text-indigo-700 dark:text-indigo-400 uppercase mb-2" id="label-input-edit-nilai">Input Nilai Baru</label>
                     <input type="text" id="edit-nilai-val" class="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border-2 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500 font-bold text-lg outline-none transition text-gray-800 dark:text-white">
                     <textarea id="edit-nilai-val-area" class="hidden w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border-2 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500 font-bold text-base outline-none transition text-gray-800 dark:text-white resize-y min-h-[100px]" rows="3"></textarea>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" id="panduan-edit-nilai"></p>
                 </div>
-                
-                <div class="pt-4 flex justify-end gap-3"><button type="button" onclick="closeModalEditNilai()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition shadow">Batal</button><button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition">Update ke Server</button></div>
+                <div class="pt-4 flex justify-end gap-3"><button type="button" onclick="closeModalEditNilai()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition shadow">Batal</button><button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition">Simpan Perubahan</button></div>
             </form>
         </div>
     </div>
 
     <!-- AUTHENTICATION WRAPPER -->
     <div id="auth-wrapper" class="fixed inset-0 z-50 bg-gradient-to-br from-indigo-900 to-indigo-700 flex items-center justify-center overflow-y-auto p-4">
+        <!-- FORM LOGIN -->
         <div id="form-login" class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-md m-4 transition-all duration-300 relative overflow-hidden animate-slide-up border border-white/10">
             <div id="login-progress" class="absolute top-0 left-0 h-1.5 bg-indigo-500 transition-all duration-300 w-0"></div>
             <div class="text-center mb-8 mt-2"><div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 mb-4 text-4xl shadow-inner border border-indigo-100 dark:border-indigo-800"><i class="fa-solid fa-graduation-cap"></i></div><h2 class="text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">E-Raport</h2><p class="text-gray-500 dark:text-gray-400 mt-2 font-medium">Login ke dalam sistem</p></div>
@@ -221,6 +184,7 @@
             <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-8 pt-5 border-t border-gray-100 dark:border-gray-700">Belum punya akun? <a href="#" onclick="switchAuth('register')" class="text-indigo-600 dark:text-indigo-400 font-extrabold hover:underline">Daftar di sini</a></p>
         </div>
 
+        <!-- FORM REGISTER -->
         <div id="form-register" class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-2xl m-4 hidden transition-all duration-300 relative overflow-hidden border border-white/10">
             <div id="reg-progress" class="absolute top-0 left-0 h-1.5 bg-green-500 transition-all duration-300 w-0"></div>
             <div class="text-center mb-6 mt-2"><h2 class="text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">Daftar Akun Baru</h2></div>
@@ -246,7 +210,6 @@
     <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="flex-1 flex w-full h-full hidden relative overflow-hidden">
         
-        <!-- SIDEBAR OVERLAY (MOBILE) -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
 
         <!-- SIDEBAR -->
@@ -257,19 +220,19 @@
             </div>
             <nav class="flex-1 overflow-y-auto py-4 custom-scrollbar">
                 <ul class="space-y-1">
-                    <li><a href="#" onclick="showPage('dashboard')" class="block px-6 py-3 bg-indigo-800/50 dark:bg-gray-800/80 border-l-4 border-indigo-400 hover:bg-indigo-800 dark:hover:bg-gray-800 transition menu-item font-medium" id="menu-dashboard"><i class="fa-solid fa-house mr-3 w-5"></i> Dashboard</a></li>
+                    <li><a href="#dashboard" class="block px-6 py-3 bg-indigo-800/50 dark:bg-gray-800/80 border-l-4 border-indigo-400 hover:bg-indigo-800 dark:hover:bg-gray-800 transition menu-item font-medium" id="menu-dashboard"><i class="fa-solid fa-house mr-3 w-5"></i> Dashboard</a></li>
                     
                     <div id="sidebar-guru-menu">
                         <p class="px-6 py-2 text-[10px] font-black text-indigo-400 dark:text-gray-500 uppercase mt-4 tracking-widest">Tugas Guru</p>
-                        <li><a href="#" onclick="showPage('input-nilai')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-input-nilai"><i class="fa-solid fa-pen-to-square mr-3 w-5 text-indigo-300"></i> Input Nilai</a></li>
-                        <li><a href="#" onclick="showPage('daftar-siswa')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-daftar-siswa"><i class="fa-solid fa-users mr-3 w-5 text-indigo-300"></i> Daftar Siswa</a></li>
-                        <li><a href="#" onclick="showPage('daftar-nilai')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-daftar-nilai"><i class="fa-solid fa-clipboard-list mr-3 w-5 text-indigo-300"></i> Daftar Nilai</a></li>
+                        <li><a href="#input-nilai" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-input-nilai"><i class="fa-solid fa-pen-to-square mr-3 w-5 text-indigo-300"></i> Input Nilai</a></li>
+                        <li><a href="#daftar-siswa" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-daftar-siswa"><i class="fa-solid fa-users mr-3 w-5 text-indigo-300"></i> Daftar Siswa</a></li>
+                        <li><a href="#daftar-nilai" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 hover:border-indigo-400 transition menu-item font-medium" id="menu-daftar-nilai"><i class="fa-solid fa-clipboard-list mr-3 w-5 text-indigo-300"></i> Daftar Nilai</a></li>
                         
                         <li id="menu-item-man-siswa-container" class="mt-2">
                             <div onclick="toggleSubmenu('submenu-manajemen')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition cursor-pointer flex justify-between items-center text-indigo-100 font-medium"><div><i class="fa-solid fa-gears mr-3 w-5 text-indigo-300"></i> Manajemen</div><i class="fa-solid fa-chevron-down text-xs"></i></div>
                             <ul id="submenu-manajemen" class="submenu bg-indigo-950/50 dark:bg-black/20">
-                                <li><a href="#" onclick="showPage('manajemen-siswa')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-item-data-siswa-link">Data Siswa</a></li>
-                                <li><a href="#" onclick="showPage('kelola-nilai')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-item-kelola-nilai-link">Kelola Nilai</a></li>
+                                <li id="wrap-link-manajemen-siswa"><a href="#manajemen-siswa" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-item-data-siswa-link">Data Siswa</a></li>
+                                <li><a href="#kelola-nilai" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-item-kelola-nilai-link">Kelola Nilai</a></li>
                             </ul>
                         </li>
                     </div>
@@ -280,23 +243,22 @@
                         <li id="menu-item-man-admin-container">
                             <div onclick="toggleSubmenu('submenu-manajemen-admin')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition cursor-pointer flex justify-between items-center text-indigo-100 font-medium"><div><i class="fa-solid fa-gears mr-3 w-5 text-indigo-300"></i> Manajemen Data</div><i class="fa-solid fa-chevron-down text-xs"></i></div>
                             <ul id="submenu-manajemen-admin" class="submenu bg-indigo-950/50 dark:bg-black/20">
-                                <li><a href="#" onclick="showPage('manajemen-siswa')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Data Siswa</a></li>
-                                <li><a href="#" onclick="showPage('kelola-nilai')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Kelola Nilai</a></li>
-                                <li><a href="#" onclick="showPage('manajemen-pengguna')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Data Pengguna</a></li>
+                                <li><a href="#manajemen-siswa" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-manajemen-siswa">Data Siswa</a></li>
+                                <li><a href="#kelola-nilai" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-kelola-nilai">Kelola Nilai</a></li>
+                                <li><a href="#manajemen-pengguna" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-manajemen-pengguna">Data Pengguna</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <div onclick="toggleSubmenu('submenu-cetak')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition cursor-pointer flex justify-between items-center text-yellow-300 font-medium"><div><i class="fa-solid fa-print mr-3 w-5"></i> Cetak Raport</div><i class="fa-solid fa-chevron-down text-xs"></i></div>
                             <ul id="submenu-cetak" class="submenu bg-indigo-950/50 dark:bg-black/20">
-                                <li><a href="#" onclick="showPage('cetak-massal')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-200 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Cetak Massal</a></li>
-                                <li><a href="#" onclick="showPage('cetak-individu')" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-200 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Cetak Individu</a></li>
+                                <li><a href="#cetak-massal" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-200 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-cetak-massal">Cetak Massal</a></li>
+                                <li><a href="#cetak-individu" class="block px-14 py-2.5 text-sm font-medium hover:text-white text-indigo-200 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50" id="menu-cetak-individu">Cetak Individu</a></li>
                             </ul>
                         </li>
                         
-                        <!-- PENGATURAN MENU BARU -->
                         <li class="mt-2">
-                            <a href="#" onclick="showPage('pengaturan')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition menu-item font-medium" id="menu-pengaturan"><i class="fa-solid fa-gear mr-3 w-5 text-indigo-300"></i> Pengaturan</a>
+                            <a href="#pengaturan" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition menu-item font-medium" id="menu-pengaturan"><i class="fa-solid fa-gear mr-3 w-5 text-indigo-300"></i> Pengaturan</a>
                         </li>
                     </div>
                 </ul>
@@ -314,29 +276,26 @@
                 <div class="flex items-center gap-3 md:gap-4">
                     <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"><i class="fa-solid fa-bars text-xl"></i></button>
                     <h2 id="page-title" class="text-lg md:text-xl font-bold text-gray-800 dark:text-white uppercase tracking-wide">Dashboard</h2>
-                    <div class="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 cursor-pointer shadow-sm hover:shadow transition" onclick="manualSync()" title="Refresh Data">
+                    <div class="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm transition">
                         <div id="sync-dot" class="w-2.5 h-2.5 rounded-full synced shadow-inner"></div><span id="sync-text" class="text-xs font-bold text-gray-600 dark:text-gray-300">Terhubung</span>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4 relative profile-dropdown-container">
-                    <div class="md:hidden flex items-center justify-center p-2 rounded-full cursor-pointer" onclick="manualSync()">
+                    <div class="md:hidden flex items-center justify-center p-2 rounded-full cursor-pointer">
                          <div id="sync-dot-mobile" class="w-3 h-3 rounded-full synced shadow-sm border border-white dark:border-gray-800"></div>
                     </div>
                     <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition outline-none"><i id="theme-icon" class="fa-solid fa-moon text-lg"></i></button>
 
-                    <!-- Profile Avatar -->
                     <div class="flex items-center gap-3 bg-white dark:bg-gray-800 p-1.5 md:p-2 rounded-full md:rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition shadow-sm" onclick="toggleProfileMenu(event)">
                         <div class="text-right hidden md:block pl-2">
                             <p class="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight" id="ui-nama-guru">-</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 font-semibold"><span id="ui-role">-</span> <i class="fa-solid fa-caret-down ml-1"></i></p>
                         </div>
-                        <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-                            <i class="fa-solid fa-user-astronaut text-lg"></i>
-                        </div>
+                        <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"><i class="fa-solid fa-user-astronaut text-lg"></i></div>
                     </div>
 
-                    <!-- Dropdown Menu -->
+                    <!-- Dropdown Profile -->
                     <div id="profile-menu-box" class="hidden absolute right-0 top-14 mt-2 w-72 md:w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-5 z-50 transform origin-top-right animate-fade-in">
                         <div class="border-b border-gray-100 dark:border-gray-700 pb-3 mb-3"><h4 class="font-bold text-indigo-800 dark:text-indigo-400 text-lg">Detail Pengguna</h4></div>
                         <div class="space-y-3">
@@ -349,77 +308,62 @@
                 </div>
             </header>
 
+            <!-- ISI KONTEN (SEMUA SECTION SAMA, LOGIC UI DI JS DIBAWAH) -->
             <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full relative custom-scrollbar">
                 
                 <!-- SECTION DASHBOARD -->
                 <section id="dashboard" class="page-section animate-fade-in">
-                    
                     <div class="bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-800 dark:via-gray-800 dark:to-indigo-900/30 border-l-4 border-indigo-600 p-6 md:p-8 rounded-2xl mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between relative overflow-hidden">
-                        <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/3 -translate-y-1/4">
-                            <i class="fa-solid fa-graduation-cap text-[150px] text-indigo-500"></i>
-                        </div>
+                        <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/3 -translate-y-1/4"><i class="fa-solid fa-graduation-cap text-[150px] text-indigo-500"></i></div>
                         <div class="relative z-10">
                             <h3 class="text-2xl md:text-3xl font-extrabold text-gray-800 dark:text-white mb-2" id="welcome-msg">Selamat Datang! 👋</h3>
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 inline-flex items-center bg-white dark:bg-gray-700/50 px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-600" id="dash-info-role">-</p>
                         </div>
                     </div>
-
                     <div class="mb-5"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3"><i class="fa-solid fa-filter mr-1"></i> Filter Data Dashboard:</p><div id="dash-filter-buttons" class="flex flex-wrap gap-2"></div></div>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div class="bg-gradient-to-br from-white to-indigo-50/50 dark:from-gray-800 dark:to-indigo-900/20 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-800/50 p-6 relative overflow-hidden group hover:shadow-lg transition duration-300">
-                            <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4">
-                                <i class="fa-solid fa-users text-[120px] text-indigo-600"></i>
-                            </div>
-                            <div class="flex justify-between items-start mb-6 relative z-10">
-                                <div>
-                                    <p class="text-xs text-indigo-600 dark:text-indigo-400 uppercase font-extrabold mb-1 tracking-wider" id="dash-title-siswa">Total Siswa (Filter)</p>
-                                    <p class="text-5xl md:text-6xl font-black text-gray-800 dark:text-white tracking-tight drop-shadow-sm" id="dash-total-siswa">0</p>
-                                </div>
-                                <div class="text-white text-3xl bg-indigo-500 dark:bg-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition duration-300"><i class="fa-solid fa-users"></i></div>
-                            </div>
+                            <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4"><i class="fa-solid fa-users text-[120px] text-indigo-600"></i></div>
+                            <div class="flex justify-between items-start mb-6 relative z-10"><div><p class="text-xs text-indigo-600 dark:text-indigo-400 uppercase font-extrabold mb-1 tracking-wider" id="dash-title-siswa">Total Siswa (Filter)</p><p class="text-5xl md:text-6xl font-black text-gray-800 dark:text-white tracking-tight drop-shadow-sm" id="dash-total-siswa">0</p></div><div class="text-white text-3xl bg-indigo-500 dark:bg-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition duration-300"><i class="fa-solid fa-users"></i></div></div>
                             <div class="grid grid-cols-2 gap-4 border-t border-indigo-100/50 dark:border-gray-700 pt-5 relative z-10">
-                                <div class="flex items-center gap-3 bg-white/60 dark:bg-gray-800/60 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-mars"></i></div>
-                                    <div><p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Laki-Laki</p><p class="text-xl font-bold text-gray-800 dark:text-gray-200 leading-none" id="dash-L">0</p></div>
-                                </div>
-                                <div class="flex items-center gap-3 bg-white/60 dark:bg-gray-800/60 p-3 rounded-xl border border-pink-100 dark:border-pink-900/30">
-                                    <div class="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center text-pink-600 dark:text-pink-400"><i class="fa-solid fa-venus"></i></div>
-                                    <div><p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Perempuan</p><p class="text-xl font-bold text-gray-800 dark:text-gray-200 leading-none" id="dash-P">0</p></div>
-                                </div>
+                                <div class="flex items-center gap-3 bg-white/60 dark:bg-gray-800/60 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30"><div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-mars"></i></div><div><p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Laki-Laki</p><p class="text-xl font-bold text-gray-800 dark:text-gray-200 leading-none" id="dash-L">0</p></div></div>
+                                <div class="flex items-center gap-3 bg-white/60 dark:bg-gray-800/60 p-3 rounded-xl border border-pink-100 dark:border-pink-900/30"><div class="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center text-pink-600 dark:text-pink-400"><i class="fa-solid fa-venus"></i></div><div><p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Perempuan</p><p class="text-xl font-bold text-gray-800 dark:text-gray-200 leading-none" id="dash-P">0</p></div></div>
                             </div>
                         </div>
-
                         <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800 dark:to-blue-900/20 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/50 p-6 relative overflow-hidden group hover:shadow-lg transition duration-300">
-                            <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4">
-                                <i class="fa-solid fa-book-open text-[120px] text-blue-600"></i>
-                            </div>
-                            <div class="flex justify-between items-start mb-6 relative z-10">
-                                <div>
-                                    <p class="text-xs text-blue-600 dark:text-blue-400 uppercase font-extrabold mb-1 tracking-wider">Mata Pelajaran</p>
-                                    <h4 class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white drop-shadow-sm" id="info-mapel-dashboard">-</h4>
-                                </div>
-                                <div class="text-white text-3xl bg-blue-500 dark:bg-blue-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:-rotate-12 transition duration-300"><i class="fa-solid fa-book-bookmark"></i></div>
-                            </div>
-                            <div class="pt-5 border-t border-blue-100/50 dark:border-gray-700 relative z-10">
-                                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 flex items-center"><i class="fa-solid fa-chalkboard-user mr-1.5"></i> Seluruh Kelas Ajar:</p>
-                                <div id="info-kelas-dashboard" class="flex flex-wrap gap-2"></div>
-                            </div>
+                            <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4"><i class="fa-solid fa-book-open text-[120px] text-blue-600"></i></div>
+                            <div class="flex justify-between items-start mb-6 relative z-10"><div><p class="text-xs text-blue-600 dark:text-blue-400 uppercase font-extrabold mb-1 tracking-wider">Mata Pelajaran</p><h4 class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white drop-shadow-sm" id="info-mapel-dashboard">-</h4></div><div class="text-white text-3xl bg-blue-500 dark:bg-blue-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:-rotate-12 transition duration-300"><i class="fa-solid fa-book-bookmark"></i></div></div>
+                            <div class="pt-5 border-t border-blue-100/50 dark:border-gray-700 relative z-10"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 flex items-center"><i class="fa-solid fa-chalkboard-user mr-1.5"></i> Seluruh Kelas Ajar:</p><div id="info-kelas-dashboard" class="flex flex-wrap gap-2"></div></div>
                         </div>
                     </div>
-
                     <div id="box-pemantauan" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-yellow-200 dark:border-yellow-700/50 p-6 relative overflow-hidden hidden animate-fade-in mb-6">
-                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-500"></div>
-                        <h4 class="font-extrabold text-yellow-800 dark:text-yellow-500 mb-6 uppercase text-sm flex items-center tracking-wide"><i class="fa-solid fa-clipboard-check mr-2 text-xl"></i> Pemantauan Progress Penilaian</h4>
-                        
-                        <div id="container-pemantauan-mapel" class="mb-6 hidden">
-                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">MATA PELAJARAN SAYA</p>
-                            <div id="list-pemantauan-mapel" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-500"></div><h4 class="font-extrabold text-yellow-800 dark:text-yellow-500 mb-6 uppercase text-sm flex items-center tracking-wide"><i class="fa-solid fa-clipboard-check mr-2 text-xl"></i> Pemantauan Progress Penilaian</h4>
+                        <div id="container-pemantauan-mapel" class="mb-6 hidden"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">MATA PELAJARAN SAYA</p><div id="list-pemantauan-mapel" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div></div>
+                        <div id="container-pemantauan-wali" class="hidden mt-2"><p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">KELAS PERWALIAN (<span id="label-wali-kelas" class="text-indigo-600 dark:text-indigo-400"></span>)</p><div id="list-pemantauan-wali" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div></div>
+                    </div>
+                </section>
+
+                <!-- SECTION PENGATURAN -->
+                <section id="pengaturan" class="page-section hidden animate-fade-in">
+                    <div class="max-w-4xl mx-auto">
+                        <h3 class="text-2xl md:text-3xl font-extrabold text-gray-800 dark:text-white mb-6 tracking-tight"><i class="fa-solid fa-gear text-indigo-500 mr-2"></i> Pengaturan Sistem</h3>
+                        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 flex flex-col md:flex-row items-center gap-6">
+                            <div class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 dark:text-indigo-400 text-4xl shadow-inner border border-indigo-200 dark:border-indigo-800"><i class="fa-solid fa-user-shield"></i></div>
+                            <div class="text-center md:text-left flex-1"><h4 class="text-xl font-extrabold text-gray-800 dark:text-white mb-1">Akun Pengguna</h4><p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Informasi kredensial keamanan akun Anda.</p></div>
+                            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 w-full md:w-auto text-sm space-y-3">
+                                <div class="flex justify-between gap-6 border-b border-gray-200 dark:border-gray-700 pb-2"><span class="text-gray-500 font-bold uppercase text-xs">Nama</span> <strong class="text-gray-800 dark:text-gray-200" id="set-akun-nama">-</strong></div>
+                                <div class="flex justify-between gap-6"><span class="text-gray-500 font-bold uppercase text-xs">Role</span> <strong class="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded text-xs font-bold border border-red-100 dark:border-red-800/50" id="set-akun-role">-</strong></div>
+                            </div>
                         </div>
 
-                        <div id="container-pemantauan-wali" class="hidden mt-2">
-                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">KELAS PERWALIAN (<span id="label-wali-kelas" class="text-indigo-600 dark:text-indigo-400"></span>)</p>
-                            <div id="list-pemantauan-wali" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+                        <div id="area-profil-sekolah-admin" class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hidden">
+                            <div class="bg-indigo-600 dark:bg-indigo-800 p-6 text-white relative overflow-hidden"><div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4"><i class="fa-solid fa-school text-[100px]"></i></div><h4 class="font-extrabold text-xl relative z-10"><i class="fa-solid fa-school-flag mr-2"></i> Profil & Identitas Sekolah</h4><p class="text-sm text-indigo-100 mt-1 relative z-10 font-medium">Data master ini digunakan sebagai kop dan identitas dasar pada hasil Cetak Raport.</p></div>
+                            <form id="form-pengaturan" onsubmit="triggerSavePengaturan(event)" class="p-6 md:p-8 space-y-6">
+                                <div><h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4"><i class="fa-solid fa-building mr-1"></i> Informasi Sekolah</h4><div class="grid grid-cols-1 gap-4"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Sekolah</label><input type="text" id="set-nama-sekolah" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Alamat Lengkap</label><textarea id="set-alamat" required rows="2" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none resize-none transition font-medium"></textarea></div></div></div>
+                                <div><h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-user-tie mr-1"></i> Pimpinan Sekolah</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Kepala Sekolah</label><input type="text" id="set-kepsek" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">NIP Kepala Sekolah</label><input type="text" id="set-nip" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div></div></div>
+                                <div><h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-calendar-days mr-1"></i> Periode Akademik (Cetak)</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tahun Pelajaran</label><input type="text" id="set-tapel" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div><div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Semester</label><select id="set-semester" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"><option value="Ganjil">Ganjil</option><option value="Genap">Genap</option></select></div><div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Fase (Kurikulum)</label><input type="text" id="set-fase" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div><div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Raport</label><input type="text" id="set-tgl" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div></div></div>
+                                <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end"><button type="submit" class="w-full md:w-auto bg-green-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-green-700 shadow-lg transition text-lg"><i class="fa-solid fa-save mr-2"></i> Simpan Perubahan</button></div>
+                            </form>
                         </div>
                     </div>
                 </section>
@@ -429,109 +373,27 @@
                     <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                         <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2"><i class="fa-solid fa-user-tie mr-2 text-indigo-500"></i> Kelola Data Pengguna (Guru)</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Daftar seluruh guru dan administrator yang terdaftar di dalam sistem.</p>
-                        
-                        <div class="mb-5 relative">
-                            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                            <input type="text" id="search-pengguna" onkeyup="renderTabelPengguna()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" placeholder="Cari nama guru, mapel, atau kelas...">
-                        </div>
-
+                        <div class="mb-5 relative"><i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i><input type="text" id="search-pengguna" onkeyup="renderTabelPengguna()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" placeholder="Cari nama guru, mapel, atau kelas..."></div>
                         <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                             <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                    <tr>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap & User</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Role</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Mata Pelajaran</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Kelas Ajar</th>
-                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Wali Kelas</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-pengguna" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                </tbody>
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap & User</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Role</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Mata Pelajaran</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Kelas Ajar</th><th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Wali Kelas</th></tr></thead>
+                                <tbody id="tbody-pengguna" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"></tbody>
                             </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- SECTION PENGATURAN (BARU) -->
-                <section id="pengaturan" class="page-section hidden animate-fade-in">
-                    <div class="max-w-4xl mx-auto">
-                        <h3 class="text-2xl md:text-3xl font-extrabold text-gray-800 dark:text-white mb-6 tracking-tight"><i class="fa-solid fa-gear text-indigo-500 mr-2"></i> Pengaturan Sistem</h3>
-                        
-                        <!-- Account Card -->
-                        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 flex flex-col md:flex-row items-center gap-6">
-                            <div class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 dark:text-indigo-400 text-4xl shadow-inner border border-indigo-200 dark:border-indigo-800"><i class="fa-solid fa-user-shield"></i></div>
-                            <div class="text-center md:text-left flex-1">
-                                <h4 class="text-xl font-extrabold text-gray-800 dark:text-white mb-1">Akun Administrator</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Informasi kredensial keamanan akun Anda.</p>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700 w-full md:w-auto text-sm space-y-3">
-                                <div class="flex justify-between gap-6 border-b border-gray-200 dark:border-gray-700 pb-2"><span class="text-gray-500 font-bold uppercase text-xs">Nama Admin</span> <strong class="text-gray-800 dark:text-gray-200" id="set-akun-nama">-</strong></div>
-                                <div class="flex justify-between gap-6"><span class="text-gray-500 font-bold uppercase text-xs">Role</span> <strong class="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded text-xs font-bold border border-red-100 dark:border-red-800/50" id="set-akun-role">-</strong></div>
-                            </div>
-                        </div>
-
-                        <!-- Profil Sekolah Form -->
-                        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                            <div class="bg-indigo-600 dark:bg-indigo-800 p-6 text-white relative overflow-hidden">
-                                <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-                                    <i class="fa-solid fa-school text-[100px]"></i>
-                                </div>
-                                <h4 class="font-extrabold text-xl relative z-10"><i class="fa-solid fa-school-flag mr-2"></i> Profil & Identitas Sekolah</h4>
-                                <p class="text-sm text-indigo-100 mt-1 relative z-10 font-medium">Data master ini digunakan sebagai kop dan identitas dasar pada hasil Cetak Raport.</p>
-                            </div>
-                            <form id="form-pengaturan" onsubmit="triggerSavePengaturan(event)" class="p-6 md:p-8 space-y-6">
-                                <div>
-                                    <h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4"><i class="fa-solid fa-building mr-1"></i> Informasi Sekolah</h4>
-                                    <div class="grid grid-cols-1 gap-4">
-                                        <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Sekolah</label><input type="text" id="set-nama-sekolah" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div>
-                                        <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Alamat Lengkap</label><textarea id="set-alamat" required rows="2" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none resize-none transition font-medium"></textarea></div>
-                                    </div>
-                                </div>
-                
-                                <div>
-                                    <h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-user-tie mr-1"></i> Pimpinan Sekolah</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Kepala Sekolah</label><input type="text" id="set-kepsek" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div>
-                                        <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">NIP Kepala Sekolah</label><input type="text" id="set-nip" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"></div>
-                                    </div>
-                                </div>
-                
-                                <div>
-                                    <h4 class="text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 mt-2"><i class="fa-solid fa-calendar-days mr-1"></i> Periode Akademik (Cetak)</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                        <div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tahun Pelajaran</label><input type="text" id="set-tapel" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div>
-                                        <div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Semester</label><select id="set-semester" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"><option value="Ganjil">Ganjil</option><option value="Genap">Genap</option></select></div>
-                                        <div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Fase (Kurikulum)</label><input type="text" id="set-fase" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div>
-                                        <div class="md:col-span-2 lg:col-span-1"><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Raport</label><input type="text" id="set-tgl" required class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-center font-bold transition"></div>
-                                    </div>
-                                </div>
-                
-                                <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                                    <button type="submit" class="w-full md:w-auto bg-green-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-green-700 shadow-lg transition text-lg"><i class="fa-solid fa-save mr-2"></i> Simpan Perubahan</button>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </section>
 
                 <!-- SECTION INPUT NILAI -->
                 <section id="input-nilai" class="page-section hidden animate-fade-in">
-                    <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                        <!-- LOADING OVERLAY -->
+                        <div id="loading-overlay-input" class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 z-10 hidden items-center justify-center backdrop-blur-sm transition-all duration-300">
+                            <div class="flex flex-col items-center bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700"><div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div><p class="text-sm font-bold text-indigo-800 dark:text-indigo-400">Sinkronisasi Background...</p><p class="text-xs text-gray-500 mt-1">Mengirim data antrean ke server</p></div>
+                        </div>
+
                         <div class="flex flex-col md:flex-row gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
-                            <div class="flex-1">
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">1. Pilih Kelas Target</label>
-                                <select id="filter-kelas-input" onchange="onClassChangeInput()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
-                                    <option value="">Pilih Kelas Terlebih Dahulu...</option>
-                                </select>
-                                <p id="notif-wali-input" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-900/30 p-2 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Ini adalah Kelas Perwalian Anda.</p>
-                            </div>
-                            <div class="flex-1">
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori Nilai</label>
-                                <select id="kategori-nilai-input" onchange="renderInputNilai()" disabled class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-700 dark:text-indigo-400 outline-none transition disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed">
-                                    <option value="">-- Pilih Kelas Dulu --</option>
-                                </select>
-                            </div>
+                            <div class="flex-1"><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">1. Pilih Kelas Target</label><select id="filter-kelas-input" onchange="onClassChangeInput()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium"><option value="">Pilih Kelas Terlebih Dahulu...</option></select><p id="notif-wali-input" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-900/30 p-2 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Ini adalah Kelas Perwalian Anda.</p></div>
+                            <div class="flex-1"><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori Nilai</label><select id="kategori-nilai-input" onchange="renderInputNilai()" disabled class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-700 dark:text-indigo-400 outline-none transition disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"><option value="">-- Pilih Kelas Dulu --</option></select></div>
                         </div>
                         
                         <div class="flex space-x-2 mb-6 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg inline-flex w-full md:w-auto overflow-x-auto">
@@ -544,17 +406,8 @@
                             
                             <div class="w-full border border-gray-200 dark:border-gray-700 rounded-xl md:rounded-lg overflow-hidden md:overflow-visible">
                                 <table class="w-full text-left border-collapse">
-                                    <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                        <tr>
-                                            <th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-16">Absen</th>
-                                            <th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th>
-                                            <th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap</th>
-                                            <th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-64 md:w-80">Input Nilai</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-input-manual" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                        <tr class="block md:table-row"><td colspan="4" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas di atas untuk memuat data.</td></tr>
-                                    </tbody>
+                                    <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-16">Absen</th><th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th><th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap</th><th class="px-4 py-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-64 md:w-80">Input Nilai</th></tr></thead>
+                                    <tbody id="tbody-input-manual" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"><tr class="block md:table-row"><td colspan="4" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas di atas untuk memuat data.</td></tr></tbody>
                                 </table>
                             </div>
                             
@@ -565,22 +418,11 @@
                         </div>
 
                         <div id="area-input-excel" class="hidden">
-                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-5 rounded-xl mb-6 text-sm leading-relaxed shadow-sm">
-                                <p class="font-bold text-base mb-2"><i class="fa-solid fa-circle-info mr-2 text-blue-600 dark:text-blue-400"></i> Panduan Import Excel</p>
-                                <ol class="list-decimal ml-6 space-y-1.5">
-                                    <li>Pastikan <span class="font-bold">Kelas</span> dan <span class="font-bold">Kategori</span> di atas sudah sesuai.</li>
-                                    <li>Urutan kolom Excel WAJIB: <strong>No Absen | NIS | Nama Lengkap | Nilai</strong>.</li>
-                                    <li>Aturan Nilai: Mapel (Angka 1-100) dan Sikap/BK (A/B/C/D).</li>
-                                    <li>Copy data tanpa Header, Paste di kotak teks bawah. (Data lama akan di-Timpa).</li>
-                                </ol>
-                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-5 rounded-xl mb-6 text-sm leading-relaxed shadow-sm"><p class="font-bold text-base mb-2"><i class="fa-solid fa-circle-info mr-2 text-blue-600 dark:text-blue-400"></i> Panduan Import Excel</p><ol class="list-decimal ml-6 space-y-1.5"><li>Pastikan <span class="font-bold">Kelas</span> dan <span class="font-bold">Kategori</span> di atas sudah sesuai.</li><li>Urutan kolom Excel WAJIB: <strong>No Absen | NIS | Nama Lengkap | Nilai</strong>.</li><li>Aturan Nilai: Mapel (Angka 1-100) dan Sikap/BK (A/B/C/D).</li><li>Copy data tanpa Header, Paste di kotak teks bawah. (Data lama akan di-Timpa).</li></ol></div>
                             <textarea id="inp-excel-nilai" rows="10" placeholder="Paste (Ctrl+V) data Excel Anda di sini..." class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-4 font-mono text-sm whitespace-pre focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-gray-300"></textarea>
                             <div class="mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
                                 <p class="text-sm text-gray-500 dark:text-gray-400 font-semibold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg w-full md:w-auto text-center" id="info-excel-nilai">0 baris terdeteksi.</p>
-                                <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                                    <button onclick="validasiExcelNilai()" class="w-full md:w-auto bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 shadow-md transition"><i class="fa-solid fa-spell-check mr-2"></i> Validasi Format</button>
-                                    <button onclick="prosesExcelNilai()" class="w-full md:w-auto bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg transition"><i class="fa-solid fa-check-double mr-2"></i> Proses & Simpan</button>
-                                </div>
+                                <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto"><button onclick="validasiExcelNilai()" class="w-full md:w-auto bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 shadow-md transition"><i class="fa-solid fa-spell-check mr-2"></i> Validasi Format</button><button onclick="prosesExcelNilai()" class="w-full md:w-auto bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg transition"><i class="fa-solid fa-check-double mr-2"></i> Proses & Simpan</button></div>
                             </div>
                         </div>
                     </div>
@@ -590,41 +432,15 @@
                 <section id="daftar-nilai" class="page-section hidden animate-fade-in">
                     <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                         <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-book-open text-indigo-500 mr-3"></i> Rekapitulasi Daftar Nilai</h3>
-                        
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">1. Filter Kelas</label>
-                                <select id="filter-kelas-daftarnilai" onchange="onClassChangeDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                    <option value="Semua">Semua Kelas</option>
-                                </select>
-                                <p id="notif-wali-daftar" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-900/30 p-1.5 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Kelas Perwalian Anda.</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Kategori</label>
-                                <select id="cat-daftar-nilai" onchange="renderDaftarNilai()" class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <option value="NilaiMapel">Nilai Mata Pelajaran</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">3. Pencarian</label>
-                                <div class="relative"><i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i><input type="text" id="search-daftar-nilai" onkeyup="renderDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 pl-10 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" placeholder="Cari nama / NIS..."></div>
-                            </div>
+                            <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">1. Filter Kelas</label><select id="filter-kelas-daftarnilai" onchange="onClassChangeDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium"><option value="Semua">Semua Kelas</option></select><p id="notif-wali-daftar" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-900/30 p-1.5 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Kelas Perwalian Anda.</p></div>
+                            <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Kategori</label><select id="cat-daftar-nilai" onchange="renderDaftarNilai()" class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none"><option value="NilaiMapel">Nilai Mata Pelajaran</option></select></div>
+                            <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">3. Pencarian</label><div class="relative"><i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i><input type="text" id="search-daftar-nilai" onkeyup="renderDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 pl-10 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" placeholder="Cari nama / NIS..."></div></div>
                         </div>
-                        
                         <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                             <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                    <tr>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Siswa</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-20">Kelas</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48" id="th-info-tambahan">Mata Pelajaran</th>
-                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Nilai Akhir</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-daftar-nilai" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                    <tr class="block md:table-row"><td colspan="5" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas/kategori untuk memuat data.</td></tr>
-                                </tbody>
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Siswa</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-20">Kelas</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48" id="th-info-tambahan">Mata Pelajaran</th><th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Nilai Akhir</th></tr></thead>
+                                <tbody id="tbody-daftar-nilai" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"><tr class="block md:table-row"><td colspan="5" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas/kategori untuk memuat data.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -640,15 +456,7 @@
                         </div>
                         <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                             <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                    <tr>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Absen</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">NIS</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
-                                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">L/P</th>
-                                    </tr>
-                                </thead>
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Absen</th><th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">NIS</th><th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap</th><th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Kelas</th><th class="px-6 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">L/P</th></tr></thead>
                                 <tbody id="tbody-siswa" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"></tbody>
                             </table>
                         </div>
@@ -675,24 +483,16 @@
                         <!-- Form Input Single -->
                         <div id="area-ms-single" class="max-w-2xl bg-gray-50 dark:bg-gray-900/50 p-5 md:p-6 rounded-xl border border-gray-100 dark:border-gray-800">
                             <form id="form-single-siswa" onsubmit="submitSingleSiswa(event)" class="space-y-5">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">No. Absen</label><input type="number" id="inp-noabsen" required class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">NIS</label><input type="text" id="inp-nis" required class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">No. Absen</label><input type="number" id="inp-noabsen" required class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">NIS</label><input type="text" id="inp-nis" required class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div></div>
                                 <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label><input type="text" id="inp-nama" required class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Kelas</label><input type="text" id="inp-kelas" required placeholder="Cth: 10-A" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 uppercase focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Gender</label><select id="inp-gender" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select></div>
-                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5"><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Kelas</label><input type="text" id="inp-kelas" required placeholder="Cth: 10-A" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 uppercase focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Gender</label><select id="inp-gender" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select></div></div>
                                 <div class="pt-2 border-t border-gray-200 dark:border-gray-700"><button type="submit" class="w-full md:w-auto bg-indigo-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-md transition" id="btn-simpan-siswa-single"><i class="fa-solid fa-plus mr-2"></i> Tambah ke Database</button></div>
                             </form>
                         </div>
                         
                         <!-- Form Paste Excel -->
                         <div id="area-ms-bulk" class="hidden">
-                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-4 rounded-xl mb-4 text-sm">
-                                <p><i class="fa-solid fa-info-circle mr-2 text-blue-600"></i> Format kolom Copy-Paste dari Excel: <strong>No Absen | NIS | Nama Lengkap | Kelas | L/P</strong></p>
-                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-4 rounded-xl mb-4 text-sm"><p><i class="fa-solid fa-info-circle mr-2 text-blue-600"></i> Format kolom Copy-Paste dari Excel: <strong>No Absen | NIS | Nama Lengkap | Kelas | L/P</strong></p></div>
                             <textarea id="inp-excel-paste" rows="10" placeholder="Paste data siswa di sini (Tanpa Header)..." class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-4 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-gray-300 shadow-inner"></textarea>
                             <div class="mt-4 text-right"><button onclick="submitBulkSiswa()" id="btn-simpan-siswa-bulk" class="w-full md:w-auto bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg transition"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Simpan Semua Data</button></div>
                         </div>
@@ -704,45 +504,17 @@
                                 <div class="relative flex-1"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="search-manajemen" onkeyup="renderTabelManajemen()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-2.5 pl-10 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cari NIS / Nama..."></div>
                             </div>
 
-                            <!-- INFO WALI KELAS (ADMIN ONLY) -->
                             <div id="admin-info-walikelas" class="hidden mb-5 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 p-5 rounded-xl border-l-4 border-indigo-500 shadow-sm transition-all animate-fade-in">
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
-                                        <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Informasi Kelas</p>
-                                        <h4 class="text-2xl font-black text-indigo-700 dark:text-indigo-400" id="ai-kelas">-</h4>
-                                    </div>
-                                    <div class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full md:w-auto">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Wali Kelas</p>
-                                        <p class="font-bold text-gray-800 dark:text-gray-200 flex items-center" id="ai-wali"><i class="fa-solid fa-user-tie text-indigo-500 mr-2"></i> <span>-</span></p>
-                                    </div>
-                                    <div class="flex gap-3 w-full md:w-auto">
-                                        <div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center">
-                                            <p class="text-[10px] font-bold text-blue-500 uppercase">Laki</p>
-                                            <p class="font-bold text-gray-800 dark:text-gray-200" id="ai-L">0</p>
-                                        </div>
-                                        <div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center">
-                                            <p class="text-[10px] font-bold text-pink-500 uppercase">Perempuan</p>
-                                            <p class="font-bold text-gray-800 dark:text-gray-200" id="ai-P">0</p>
-                                        </div>
-                                        <div class="bg-indigo-500 px-3 py-2 rounded-lg shadow-sm border border-indigo-600 flex-1 text-center text-white">
-                                            <p class="text-[10px] font-bold uppercase opacity-80">Total</p>
-                                            <p class="font-bold" id="ai-total">0</p>
-                                        </div>
-                                    </div>
+                                    <div><p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Informasi Kelas</p><h4 class="text-2xl font-black text-indigo-700 dark:text-indigo-400" id="ai-kelas">-</h4></div>
+                                    <div class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full md:w-auto"><p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Wali Kelas</p><p class="font-bold text-gray-800 dark:text-gray-200 flex items-center" id="ai-wali"><i class="fa-solid fa-user-tie text-indigo-500 mr-2"></i> <span>-</span></p></div>
+                                    <div class="flex gap-3 w-full md:w-auto"><div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center"><p class="text-[10px] font-bold text-blue-500 uppercase">Laki</p><p class="font-bold text-gray-800 dark:text-gray-200" id="ai-L">0</p></div><div class="bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex-1 text-center"><p class="text-[10px] font-bold text-pink-500 uppercase">Perempuan</p><p class="font-bold text-gray-800 dark:text-gray-200" id="ai-P">0</p></div><div class="bg-indigo-500 px-3 py-2 rounded-lg shadow-sm border border-indigo-600 flex-1 text-center text-white"><p class="text-[10px] font-bold uppercase opacity-80">Total</p><p class="font-bold" id="ai-total">0</p></div></div>
                                 </div>
                             </div>
                             
                             <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                                 <table class="w-full text-left border-collapse">
-                                    <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                        <tr>
-                                            <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-20">Absen</th>
-                                            <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">NIS</th>
-                                            <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama</th>
-                                            <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">Kelas</th>
-                                            <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Aksi Lokal</th>
-                                        </tr>
-                                    </thead>
+                                    <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-20">Absen</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">NIS</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">Kelas</th><th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Aksi Lokal</th></tr></thead>
                                     <tbody id="tbody-manajemen" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"></tbody>
                                 </table>
                             </div>
@@ -758,50 +530,18 @@
                         
                         <div class="bg-indigo-50/50 dark:bg-gray-900/50 p-4 rounded-xl border border-indigo-100 dark:border-gray-700 mb-6">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 text-yellow-600 dark:text-yellow-400"><i class="fa-solid fa-star text-[10px] mr-1"></i> 1. Wajib Pilih Kelas</label>
-                                    <select id="pk-kelas" onchange="onClassChangePK()" class="w-full rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-600/50 border-2 p-3 text-sm focus:ring-2 focus:ring-yellow-500 outline-none text-gray-800 dark:text-gray-200 font-semibold">
-                                        <option value="">-- Pilih Kelas --</option>
-                                    </select>
-                                    <p id="notif-wali-pk" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Kelas Perwalian Anda.</p>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori</label>
-                                    <select id="pk-kategori" onchange="onChangeCategoryPK()" disabled class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed">
-                                        <option value="">-- Pilih Kelas Dulu --</option>
-                                    </select>
-                                </div>
-                                <!-- DROPDOWN FILTER MAPEL ADMIN -->
-                                <div id="container-filter-mapel-admin" class="hidden">
-                                    <label class="block text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase mb-2">3. Filter Mapel (Admin)</label>
-                                    <select id="pk-mapel-admin" onchange="renderTabelKelolaNilai()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-800 dark:text-gray-200 font-semibold">
-                                        <option value="">Semua Mata Pelajaran</option>
-                                    </select>
-                                </div>
+                                <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 text-yellow-600 dark:text-yellow-400"><i class="fa-solid fa-star text-[10px] mr-1"></i> 1. Wajib Pilih Kelas</label><select id="pk-kelas" onchange="onClassChangePK()" class="w-full rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-600/50 border-2 p-3 text-sm focus:ring-2 focus:ring-yellow-500 outline-none text-gray-800 dark:text-gray-200 font-semibold"><option value="">-- Pilih Kelas --</option></select><p id="notif-wali-pk" class="hidden text-xs font-bold text-green-600 dark:text-green-400 mt-2 p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg transition-all animate-fade-in"><i class="fa-solid fa-star mr-1"></i> Kelas Perwalian Anda.</p></div>
+                                <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">2. Pilih Kategori</label><select id="pk-kategori" onchange="onChangeCategoryPK()" disabled class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-60 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"><option value="">-- Pilih Kelas Dulu --</option></select></div>
+                                <div id="container-filter-mapel-admin" class="hidden"><label class="block text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase mb-2">3. Filter Mapel (Admin)</label><select id="pk-mapel-admin" onchange="renderTabelKelolaNilai()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-800 dark:text-gray-200 font-semibold"><option value="">Semua Mata Pelajaran</option></select></div>
                             </div>
                         </div>
                         
-                        <div class="mb-5">
-                            <div class="relative">
-                                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                                <input type="text" id="pk-search" onkeyup="renderTabelKelolaNilai()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Cari nama / NIS siswa...">
-                            </div>
-                        </div>
+                        <div class="mb-5"><div class="relative"><i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i><input type="text" id="pk-search" onkeyup="renderTabelKelolaNilai()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Cari nama / NIS siswa..."></div></div>
                         
                         <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                             <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
-                                    <tr>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Siswa</th>
-                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase" id="pk-th">Kategori</th>
-                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Nilai Akhir</th>
-                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pk-tbody" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                    <tr class="block md:table-row"><td colspan="5" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas/kategori untuk memuat data.</td></tr>
-                                </tbody>
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group"><tr><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-24">NIS</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Siswa</th><th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase" id="pk-th">Kategori</th><th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Nilai Akhir</th><th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Aksi</th></tr></thead>
+                                <tbody id="pk-tbody" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800"><tr class="block md:table-row"><td colspan="5" class="px-4 py-10 text-center text-gray-400 italic block md:table-cell">Pilih kelas/kategori untuk memuat data.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -815,6 +555,29 @@
 
     <!-- UI/UX SPECIFIC SCRIPTS -->
     <script>
+        // ROUTING SYSTEM (HASH)
+        window.addEventListener('hashchange', () => { 
+            const p = window.location.hash.replace('#', '') || 'dashboard'; 
+            showPageInternal(p); 
+        });
+
+        function showPage(p) { window.location.hash = p; }
+        
+        function showPageInternal(p) { 
+            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden')); 
+            const page = document.getElementById(p); 
+            if(page) page.classList.remove('hidden'); 
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400')); 
+            const m = document.getElementById('menu-'+p); 
+            if(m) m.classList.add('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400'); 
+            const pageTitle = document.getElementById('page-title');
+            if(pageTitle) pageTitle.innerText = p.replace('-', ' ').toUpperCase(); 
+            if(window.innerWidth < 768) {
+                const sidebar = document.getElementById('app-sidebar');
+                if(!sidebar.classList.contains('-translate-x-full')) toggleSidebar();
+            }
+        }
+
         function toggleTheme() {
             const html = document.documentElement; const icon = document.getElementById('theme-icon');
             if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); } 
@@ -836,7 +599,14 @@
         let SESSION_DATA = null; let MASTER_DATA_SISWA = []; let ORIGINAL_DATA_SISWA = []; let MASTER_DATA_PENGGUNA = [];
         let ALL_NILAI_DATA = { NilaiMapel: [], NilaiEkskul: [], NilaiKokurikuler: [], NilaiSikap: [], NilaiCP: [] };
         let PROFIL_SEKOLAH = null;
-        let PENDING_EDITS = []; let PENDING_DELETES = []; let autoSyncTimer = null; let activeDashFilter = "Semua"; let isSyncing = false;
+        let PENDING_EDITS = []; let PENDING_DELETES = []; let autoSyncTimer = null; let isSyncing = false;
+        
+        // State Management
+        let activeDashFilter = localStorage.getItem('eraport_dash_filter') || "Semua"; 
+        
+        // Optimistic Sync Queue
+        let OFFLINE_SYNC_QUEUE = JSON.parse(localStorage.getItem('eraport_sync_queue')) || [];
+        let isProcessingQueue = false;
 
         function toTitleCase(str) { return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase()); }
         function parsePastedRow(line) { let cols = line.split('\t'); if (cols.length < 4) cols = line.split(/\s{2,}/); if (cols.length >= 4) return { absen: cols[0].trim(), nis: cols[1].trim(), nama: cols[2].trim(), nilai: cols.slice(3).join(' ').trim() }; return null; }
@@ -871,12 +641,22 @@
             if(text) text.innerText = st==='syncing'?'Syncing...':st==='success'?'Terhubung':'Error DB';
         }
 
-        window.onload = () => { const savedSession = localStorage.getItem('eraport_session'); if(savedSession) { SESSION_DATA = JSON.parse(savedSession); showAppUI(); } else { document.getElementById('auth-wrapper').classList.remove('hidden'); } };
+        window.onload = () => { 
+            const savedSession = localStorage.getItem('eraport_session'); 
+            if(savedSession) { 
+                SESSION_DATA = JSON.parse(savedSession); 
+                showAppUI(); 
+                const initialHash = window.location.hash.replace('#', '') || 'dashboard';
+                showPageInternal(initialHash);
+            } else { 
+                document.getElementById('auth-wrapper').classList.remove('hidden'); 
+            } 
+        };
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault(); const btn = document.getElementById('btn-login-submit'); btn.disabled = true; startProgress('login-progress');
             try { const json = await fetchFromGoogle("login", null, { Username: document.getElementById('log-user').value, Password: document.getElementById('log-pass').value });
-                if(json.status === 'success') { localStorage.setItem('eraport_session', JSON.stringify(json.data)); SESSION_DATA = json.data; document.getElementById('login-form').reset(); showToast('Login berhasil!', 'success'); showAppUI(); } 
+                if(json.status === 'success') { localStorage.setItem('eraport_session', JSON.stringify(json.data)); SESSION_DATA = json.data; document.getElementById('login-form').reset(); showToast('Login berhasil!', 'success'); showAppUI(); window.location.hash = 'dashboard'; } 
                 else showToast(json.message, 'error');
             } catch (err) { showToast("Gagal koneksi.", 'error'); }
             btn.disabled = false; endProgress('login-progress');
@@ -893,7 +673,7 @@
             btn.disabled = false; endProgress('reg-progress');
         });
 
-        function handleLogout() { localStorage.removeItem('eraport_session'); SESSION_DATA = null; clearInterval(autoSyncTimer); document.getElementById('app-wrapper').classList.add('hidden'); document.getElementById('auth-wrapper').classList.remove('hidden'); showToast('Logout berhasil.', 'info'); }
+        function handleLogout() { localStorage.removeItem('eraport_session'); SESSION_DATA = null; clearInterval(autoSyncTimer); document.getElementById('app-wrapper').classList.add('hidden'); document.getElementById('auth-wrapper').classList.remove('hidden'); showToast('Logout berhasil.', 'info'); window.location.hash = ''; }
         function switchAuth(type) { document.getElementById('form-login').classList.toggle('hidden', type === 'register'); document.getElementById('form-register').classList.toggle('hidden', type === 'login'); }
         function toggleFormRole() {
             const role = document.getElementById('reg-role').value; const areaGuru = document.getElementById('area-khusus-guru');
@@ -934,13 +714,16 @@
             const elKls = document.getElementById('filter-kelas-input');
             if(!elKls) return;
             const kls = elKls.value; 
+            localStorage.setItem('eraport_input_kelas', kls); // Save State
             const catSel = document.getElementById('kategori-nilai-input'); 
             const notif = document.getElementById('notif-wali-input');
             if (!kls) { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); renderInputNilai(); return; }
             catSel.disabled = false;
             const isWali = (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
             if (isWali) notif.classList.remove('hidden'); else notif.classList.add('hidden');
+            let prevCat = catSel.value || localStorage.getItem('eraport_input_cat');
             catSel.innerHTML = generateCategoryOptions(isWali, currentInputMode === 'excel');
+            if(prevCat && catSel.querySelector(`option[value="${prevCat}"]`)) catSel.value = prevCat;
             renderInputNilai();
         }
 
@@ -948,13 +731,15 @@
             const elKls = document.getElementById('filter-kelas-daftarnilai');
             if(!elKls) return;
             const kls = elKls.value; 
+            localStorage.setItem('eraport_daftar_kelas', kls); // Save State
             const catSel = document.getElementById('cat-daftar-nilai'); 
             const notif = document.getElementById('notif-wali-daftar');
             const isWali = (kls !== "Semua" && SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
             if (isWali) notif.classList.remove('hidden'); else notif.classList.add('hidden');
-            let currentVal = catSel.value;
+            let currentVal = catSel.value || localStorage.getItem('eraport_daftar_cat');
             catSel.innerHTML = generateCategoryOptions(isWali || SESSION_DATA.Role === 'Admin', false);
-            if (!catSel.querySelector(`option[value="${currentVal}"]`)) { catSel.value = "NilaiMapel"; } else { catSel.value = currentVal; }
+            if (currentVal && catSel.querySelector(`option[value="${currentVal}"]`)) { catSel.value = currentVal; } else { catSel.value = "NilaiMapel"; }
+            localStorage.setItem('eraport_daftar_cat', catSel.value);
             renderDaftarNilai();
         }
 
@@ -962,19 +747,23 @@
             const elKls = document.getElementById('pk-kelas');
             if(!elKls) return;
             const kls = elKls.value; 
+            localStorage.setItem('eraport_pk_kelas', kls); // Save State
             const catSel = document.getElementById('pk-kategori'); 
             const notif = document.getElementById('notif-wali-pk');
             if (!kls || kls === "Semua") { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); onChangeCategoryPK(); return; }
             catSel.disabled = false;
             const isWali = (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
             if (isWali) notif.classList.remove('hidden'); else notif.classList.add('hidden');
+            let prevCat = catSel.value || localStorage.getItem('eraport_pk_cat');
             catSel.innerHTML = generateCategoryOptions(isWali, false);
+            if(prevCat && catSel.querySelector(`option[value="${prevCat}"]`)) catSel.value = prevCat;
             onChangeCategoryPK();
         }
 
         function onChangeCategoryPK() {
             const cat = document.getElementById('pk-kategori')?.value;
             if(!cat) return;
+            localStorage.setItem('eraport_pk_cat', cat); // Save State
             const containerMapelAdmin = document.getElementById('container-filter-mapel-admin');
             const selectMapelAdmin = document.getElementById('pk-mapel-admin');
 
@@ -1003,9 +792,10 @@
                 document.getElementById('dash-info-role').innerHTML = `<i class="fa-solid fa-shield-halved text-indigo-500 dark:text-indigo-400 mr-2"></i> Akses Admin: Mencetak dan Kelola Master Data.`; 
                 document.getElementById('sidebar-guru-menu').classList.add('hidden'); 
                 document.getElementById('sidebar-admin-menu').classList.remove('hidden'); 
+                document.getElementById('area-profil-sekolah-admin').classList.remove('hidden');
             } else { 
                 document.getElementById('dash-info-role').innerHTML = `<i class="fa-solid fa-book-open text-indigo-500 dark:text-indigo-400 mr-2"></i> Guru Mata Pelajaran: <strong class="text-gray-800 dark:text-gray-200 ml-1">${SESSION_DATA.Mapel}</strong>`; 
-                
+                document.getElementById('area-profil-sekolah-admin').classList.add('hidden');
                 document.getElementById('info-mapel-dashboard').innerText = SESSION_DATA.Mapel;
                 const infoContainer = document.getElementById('info-kelas-dashboard');
                 if(SESSION_DATA.Kelas_Diajar !== "-") { infoContainer.innerHTML = SESSION_DATA.Kelas_Diajar.split(',').map(k => `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-bold border border-gray-200 dark:border-gray-600 shadow-sm">${k.trim()}</span>`).join(''); } 
@@ -1014,53 +804,124 @@
                 document.getElementById('sidebar-guru-menu').classList.remove('hidden'); 
                 document.getElementById('sidebar-admin-menu').classList.add('hidden'); 
                 
-                // 👇 TAMBAHAN LOGIKA UNTUK MENYEMBUNYIKAN MENU DATA SISWA 👇
-                const linkDataSiswa = document.getElementById('menu-item-data-siswa-link');
-                if (linkDataSiswa) {
-                    if (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") {
-                        // Jika dia Wali Kelas, tampilkan menu Data Siswa
-                        linkDataSiswa.parentElement.classList.remove('hidden');
-                    } else {
-                        // Jika hanya Guru Mapel biasa, sembunyikan menu Data Siswa
-                        linkDataSiswa.parentElement.classList.add('hidden');
-                    }
+                // Hide/Show Data Siswa Management for Non-Wali
+                const wrapManajemenSiswa = document.getElementById('wrap-link-manajemen-siswa');
+                if (wrapManajemenSiswa) {
+                    if (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") wrapManajemenSiswa.classList.remove('hidden');
+                    else wrapManajemenSiswa.classList.add('hidden');
                 }
-                // 👆 BATAS TAMBAHAN LOGIKA 👆
             } 
             
-            manualSync(); if(autoSyncTimer) clearInterval(autoSyncTimer); autoSyncTimer = setInterval(() => { if (!isSyncing) silentSync(); }, 60000);
+            manualSync(); 
+            if(autoSyncTimer) clearInterval(autoSyncTimer); 
+            autoSyncTimer = setInterval(() => { if (!isSyncing) silentSync(); }, 30000); // Check every 30s
+            setInterval(processSyncQueue, 10000); // Background queue worker every 10s
         }
 
-        async function silentSync() {
-            if (isSyncing) return; isSyncing = true; setSyncStatus('syncing');
+        // =========================================================================
+        // === BACKGROUND SYNC & OPTIMISTIC UI QUEUE LOGIC ===
+        // =========================================================================
+        
+        async function processSyncQueue() {
+            if(isProcessingQueue || OFFLINE_SYNC_QUEUE.length === 0 || isSyncing) return;
+            isProcessingQueue = true;
+            document.getElementById('loading-overlay-input').classList.remove('hidden');
+            document.getElementById('loading-overlay-input').classList.add('flex');
+            
             try {
-                // LOGIC PROFIL SEKOLAH DITAMBAHKAN
+                // Proses antrean satu per satu
+                while(OFFLINE_SYNC_QUEUE.length > 0) {
+                    let task = OFFLINE_SYNC_QUEUE[0];
+                    let response = await fetchFromGoogle(task.action, task.table, task.payload);
+                    if(response.status === 'success') {
+                        OFFLINE_SYNC_QUEUE.shift(); // Hapus dari antrean jika berhasil
+                        localStorage.setItem('eraport_sync_queue', JSON.stringify(OFFLINE_SYNC_QUEUE));
+                    } else {
+                        throw new Error(response.message);
+                    }
+                }
+            } catch(e) {
+                console.error("Queue Processing Error:", e);
+                // Biarkan di antrean untuk dicoba lagi nanti
+            } finally {
+                document.getElementById('loading-overlay-input').classList.add('hidden');
+                document.getElementById('loading-overlay-input').classList.remove('flex');
+                isProcessingQueue = false;
+                // Soft refresh untuk memastikan data termutakhir
+                silentSync();
+            }
+        }
+
+        let TEMP_NEW_DATA = null;
+        async function silentSync() {
+            if (isSyncing || isProcessingQueue) return; 
+            isSyncing = true; setSyncStatus('syncing');
+            try {
                 const sheetNames = ["DataSiswa","DataPengguna","NilaiMapel","NilaiEkskul","NilaiSikap","NilaiKokurikuler","NilaiCP", "ProfilSekolah"];
                 const results = await Promise.all(sheetNames.map(name => fetchFromGoogle("readAll",null,null,name)));
                 const allOk = results.every(r => r && r.status==='success');
-                if (!allOk) { const fi = results.findIndex(r=>!r||r.status!=='success'); throw new Error(`Gagal baca: ${sheetNames[fi]}`); }
-                results.forEach((r,i) => {
-                    const name = sheetNames[i]; const data = r.data[name]||[];
-                    if (name==="DataSiswa") { MASTER_DATA_SISWA = data.map(s=>({...s,_nis_lama:s.NIS})); ORIGINAL_DATA_SISWA = JSON.parse(JSON.stringify(MASTER_DATA_SISWA)); }
-                    else if (name==="DataPengguna") MASTER_DATA_PENGGUNA = data;
-                    else if (name==="ProfilSekolah") PROFIL_SEKOLAH = data[0] || null;
-                    else ALL_NILAI_DATA[name] = data;
-                });
-                PENDING_EDITS=[]; PENDING_DELETES=[]; updatePendingUI(); updateDashboardAndData(); setSyncStatus('success');
+                if (!allOk) throw new Error(`Gagal baca dari server`);
+                
+                let fetchedData = {};
+                results.forEach((r,i) => { fetchedData[sheetNames[i]] = r.data[sheetNames[i]] || []; });
 
-                // LOGIC WIZARD ADMIN
-                if (SESSION_DATA.Role === 'Admin') {
-                    if (!PROFIL_SEKOLAH) {
-                        document.getElementById('modal-setup-wizard').classList.remove('hidden');
-                        document.getElementById('modal-setup-wizard').classList.add('flex');
-                    } else {
-                        populatePengaturanForm(); 
+                // Pengecekan cerdas (Anti-Ghosting): Cek apakah user sedang ngetik
+                let hasUnsavedTyping = false;
+                document.querySelectorAll('.val-input-nilai').forEach(input => {
+                    if(input.value.trim() !== '' || document.activeElement === input) {
+                        hasUnsavedTyping = true;
                     }
+                });
+                
+                if (hasUnsavedTyping) {
+                    // Simpan data di memori sementara, munculkan tombol badge
+                    TEMP_NEW_DATA = fetchedData;
+                    document.getElementById('badge-update-tersedia').classList.remove('opacity-0', 'translate-y-20');
+                } else {
+                    applyDataFromServer(fetchedData);
                 }
-
-            } catch(e) { console.error("Sync error:",e); setSyncStatus('error'); } finally { isSyncing=false; }
+                setSyncStatus('success');
+            } catch(e) { 
+                console.error("Sync error:",e); 
+                setSyncStatus('error'); 
+            } finally { 
+                isSyncing=false; 
+            }
         }
-        async function manualSync() { startProgress('app-progress'); await silentSync(); endProgress('app-progress'); }
+
+        function applySoftSync() {
+            if(!TEMP_NEW_DATA) return;
+            applyDataFromServer(TEMP_NEW_DATA);
+            TEMP_NEW_DATA = null;
+            document.getElementById('badge-update-tersedia').classList.add('opacity-0', 'translate-y-20');
+            showToast('Tabel berhasil dimuat ulang dengan data terbaru.', 'success');
+        }
+
+        function applyDataFromServer(dataObj) {
+            MASTER_DATA_SISWA = dataObj["DataSiswa"].map(s=>({...s,_nis_lama:s.NIS})); 
+            ORIGINAL_DATA_SISWA = JSON.parse(JSON.stringify(MASTER_DATA_SISWA));
+            MASTER_DATA_PENGGUNA = dataObj["DataPengguna"];
+            PROFIL_SEKOLAH = dataObj["ProfilSekolah"][0] || null;
+            
+            ["NilaiMapel","NilaiEkskul","NilaiSikap","NilaiKokurikuler","NilaiCP"].forEach(k => {
+                ALL_NILAI_DATA[k] = dataObj[k];
+            });
+
+            PENDING_EDITS=[]; PENDING_DELETES=[]; updatePendingUI(); 
+            updateDashboardAndData();
+            
+            if (SESSION_DATA.Role === 'Admin') {
+                if (!PROFIL_SEKOLAH) { document.getElementById('modal-setup-wizard').classList.remove('hidden'); document.getElementById('modal-setup-wizard').classList.add('flex'); } 
+                else { populatePengaturanForm(); }
+            }
+        }
+
+        async function manualSync() { 
+            startProgress('app-progress'); 
+            await silentSync(); 
+            if(TEMP_NEW_DATA) applySoftSync(); // Force apply if manual
+            endProgress('app-progress'); 
+        }
 
         // =========================================================================
         // === LOGIKA SETUP WIZARD & PENGATURAN (BARU) ====
@@ -1084,85 +945,59 @@
         async function submitSetupWizard(e) {
             e.preventDefault();
             const payload = {
-                Nama_Sekolah: document.getElementById('wiz-nama-sekolah').value,
-                Alamat_Sekolah: document.getElementById('wiz-alamat').value,
-                Nama_Kepsek: document.getElementById('wiz-kepsek').value,
-                NIP_Kepsek: document.getElementById('wiz-nip').value,
-                Tahun_Pelajaran: document.getElementById('wiz-tapel').value,
-                Semester: document.getElementById('wiz-semester').value,
-                Fase: document.getElementById('wiz-fase').value,
-                Tanggal_Raport: document.getElementById('wiz-tgl').value
+                Nama_Sekolah: document.getElementById('wiz-nama-sekolah').value, Alamat_Sekolah: document.getElementById('wiz-alamat').value,
+                Nama_Kepsek: document.getElementById('wiz-kepsek').value, NIP_Kepsek: document.getElementById('wiz-nip').value,
+                Tahun_Pelajaran: document.getElementById('wiz-tapel').value, Semester: document.getElementById('wiz-semester').value,
+                Fase: document.getElementById('wiz-fase').value, Tanggal_Raport: document.getElementById('wiz-tgl').value
             };
 
             const btn = document.getElementById('btn-wizard-submit');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...`;
+            btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...`;
             
             try {
                 const json = await fetchFromGoogle("updateProfilSekolah", "ProfilSekolah", payload);
                 if(json.status === 'success') {
                     showToast("Profil Sekolah disetup!", "success");
-                    document.getElementById('modal-setup-wizard').classList.remove('flex');
-                    document.getElementById('modal-setup-wizard').classList.add('hidden');
+                    document.getElementById('modal-setup-wizard').classList.remove('flex'); document.getElementById('modal-setup-wizard').classList.add('hidden');
                     await manualSync();
-                } else {
-                    showToast("Gagal menyimpan.", "error");
-                }
+                } else { showToast("Gagal menyimpan.", "error"); }
             } catch(err) { showToast("Error koneksi.", "error"); }
-            
-            btn.disabled = false;
-            btn.innerHTML = `Simpan & Mulai Gunakan Aplikasi <i class="fa-solid fa-arrow-right ml-2"></i>`;
+            btn.disabled = false; btn.innerHTML = `Simpan & Mulai Gunakan Aplikasi <i class="fa-solid fa-arrow-right ml-2"></i>`;
         }
 
         let pendingSettingsPayload = null;
         function triggerSavePengaturan(e) {
             e.preventDefault();
             pendingSettingsPayload = {
-                Nama_Sekolah: document.getElementById('set-nama-sekolah').value,
-                Alamat_Sekolah: document.getElementById('set-alamat').value,
-                Nama_Kepsek: document.getElementById('set-kepsek').value,
-                NIP_Kepsek: document.getElementById('set-nip').value,
-                Tahun_Pelajaran: document.getElementById('set-tapel').value,
-                Semester: document.getElementById('set-semester').value,
-                Fase: document.getElementById('set-fase').value,
-                Tanggal_Raport: document.getElementById('set-tgl').value
+                Nama_Sekolah: document.getElementById('set-nama-sekolah').value, Alamat_Sekolah: document.getElementById('set-alamat').value,
+                Nama_Kepsek: document.getElementById('set-kepsek').value, NIP_Kepsek: document.getElementById('set-nip').value,
+                Tahun_Pelajaran: document.getElementById('set-tapel').value, Semester: document.getElementById('set-semester').value,
+                Fase: document.getElementById('set-fase').value, Tanggal_Raport: document.getElementById('set-tgl').value
             };
             document.getElementById('conf-password').value = "";
-            const modal = document.getElementById('modal-confirm-pass');
-            modal.classList.remove('hidden'); modal.classList.add('flex');
+            const modal = document.getElementById('modal-confirm-pass'); modal.classList.remove('hidden'); modal.classList.add('flex');
         }
 
         function closeConfirmPass() {
-            const modal = document.getElementById('modal-confirm-pass');
-            modal.classList.add('hidden'); modal.classList.remove('flex');
-            pendingSettingsPayload = null;
+            const modal = document.getElementById('modal-confirm-pass'); modal.classList.add('hidden'); modal.classList.remove('flex'); pendingSettingsPayload = null;
         }
 
         async function submitConfirmPass(e) {
             e.preventDefault();
             const inputPass = document.getElementById('conf-password').value;
-            // Validasi Password
-            if (inputPass !== SESSION_DATA.Password) {
-                showToast("Password salah! Otorisasi ditolak.", "error");
-                return;
-            }
+            if (inputPass !== SESSION_DATA.Password) { showToast("Password salah! Otorisasi ditolak.", "error"); return; }
             closeConfirmPass();
-            
             isSyncing = true; startProgress('app-progress'); showToast('Menyimpan pengaturan...', 'info');
             try {
                 const json = await fetchFromGoogle("updateProfilSekolah", "ProfilSekolah", pendingSettingsPayload);
-                if(json.status === 'success') { 
-                    showToast("Pengaturan berhasil disimpan!", 'success'); 
-                    await manualSync(); 
-                } else {
-                    showToast(json.message, 'error'); 
-                }
+                if(json.status === 'success') { showToast("Pengaturan berhasil disimpan!", 'success'); await manualSync(); } 
+                else { showToast(json.message, 'error'); }
             } catch(err) { showToast("Gagal koneksi.", 'error'); }
             isSyncing = false; endProgress('app-progress');
         }
 
 
-        function setDashFilter(k) { activeDashFilter = k; document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); const activeBtn = document.getElementById('btn-filt-'+k); if(activeBtn) activeBtn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; updateDashboardAndData(); }
+        function setDashFilter(k) { activeDashFilter = k; localStorage.setItem('eraport_dash_filter', k); document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); const activeBtn = document.getElementById('btn-filt-'+k); if(activeBtn) activeBtn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; updateDashboardAndData(); }
         function getSiswaDiajarDashboard() { let data = MASTER_DATA_SISWA; if(SESSION_DATA.Role !== 'Admin') { const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); data = data.filter(s => arr.includes(String(s.Kelas).trim().toUpperCase())); } if(activeDashFilter !== "Semua") data = data.filter(s => String(s.Kelas).trim().toUpperCase() === activeDashFilter); return data; }
 
         function generatePemantauanCard(kelas, mapel) {
@@ -1258,12 +1093,21 @@
             if(btnContainer) btnContainer.innerHTML = btnHtml;
             if(document.getElementById('btn-filt-'+activeDashFilter)) { document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); document.getElementById('btn-filt-'+activeDashFilter).className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; }
 
+            // Restore Selected States from LocalStorage
+            const storedInputKelas = localStorage.getItem('eraport_input_kelas');
+            const storedDaftarKelas = localStorage.getItem('eraport_daftar_kelas');
+            const storedPkKelas = localStorage.getItem('eraport_pk_kelas');
+
             ['filter-kelas-daftar', 'filter-kelas-input', 'filter-kelas-daftarnilai', 'pk-kelas'].forEach(id => {
                 const sel = document.getElementById(id);
                 if(sel) { 
                     const curr = sel.value; sel.innerHTML = `<option value="">${id === 'filter-kelas-input' || id === 'pk-kelas' ? '-- Pilih Kelas --' : 'Semua Kelas'}</option>`; 
                     kelasSelect.forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`); 
-                    if(curr && curr !== "Semua") sel.value = curr; 
+                    
+                    if(id === 'filter-kelas-input' && storedInputKelas && kelasSelect.includes(storedInputKelas)) sel.value = storedInputKelas;
+                    else if(id === 'filter-kelas-daftarnilai' && storedDaftarKelas && kelasSelect.includes(storedDaftarKelas)) sel.value = storedDaftarKelas;
+                    else if(id === 'pk-kelas' && storedPkKelas && kelasSelect.includes(storedPkKelas)) sel.value = storedPkKelas;
+                    else if(curr && curr !== "Semua") sel.value = curr; 
                 }
             });
             
@@ -1298,15 +1142,15 @@
             }
 
             tbody.innerHTML = data.map(g => {
-                let roleBadge = g.Role === 'Admin' ? `<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded text-xs font-bold">Admin</span>` : `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold">Guru Mapel</span>`;
+                let roleBadge = g.Role === 'Admin' ? `<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded text-xs font-bold border border-red-200 dark:border-red-800">Admin</span>` : `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold border border-blue-200 dark:border-blue-800">Guru Mapel</span>`;
                 let waliBadge = (g.Wali_Kelas && g.Wali_Kelas !== "-") ? `<span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-1 rounded text-xs font-bold">${g.Wali_Kelas}</span>` : `<span class="text-gray-400 dark:text-gray-500">-</span>`;
                 
                 return `
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0">
-                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm font-bold md:font-semibold flex flex-col md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase mb-1">Nama:</span> <span class="text-indigo-700 dark:text-indigo-300">${g.Nama_Lengkap}</span><span class="text-xs text-gray-400 dark:text-gray-500 block mt-0.5">User: ${g.Username}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm font-bold md:font-semibold flex flex-col md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase mb-1">Nama:</span> <span class="text-indigo-700 dark:text-indigo-300">${g.Nama_Lengkap}</span><span class="text-xs text-gray-400 dark:text-gray-500 block mt-0.5 font-normal">User: ${g.Username}</span></td>
                     <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell items-center"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Role:</span> <span>${roleBadge}</span></td>
                     <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Mapel:</span> <span class="font-medium text-gray-800 dark:text-gray-200">${g.Mapel}</span></td>
-                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Kelas Ajar:</span> <span class="text-right whitespace-normal max-w-[200px] break-words text-gray-700 dark:text-gray-300">${g.Kelas_Diajar}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Kelas Ajar:</span> <span class="text-right whitespace-normal max-w-[200px] break-words text-gray-700 dark:text-gray-300 font-medium">${g.Kelas_Diajar}</span></td>
                     <td class="px-3 md:px-4 py-2 md:py-3 text-sm md:text-center flex justify-between md:table-cell border-t border-gray-100 dark:border-gray-700 md:border-none mt-2 pt-2 md:mt-0"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Wali Kelas:</span> <span>${waliBadge}</span></td>
                 </tr>`;
             }).join('');
@@ -1355,7 +1199,7 @@
             const k = document.getElementById('filter-kelas-input')?.value; const cat = document.getElementById('kategori-nilai-input')?.value; const tbody = document.getElementById('tbody-input-manual');
             if(!tbody) return;
             if(!k || !cat) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Pilih kelas dan kategori terlebih dahulu.</td></tr>`; return; }
-            if(isSyncing) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-indigo-400 italic block md:table-cell"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Sedang memuat data dari server...</td></tr>`; return; }
+            if(isProcessingQueue) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-indigo-400 italic block md:table-cell"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Sedang sinkronisasi data...</td></tr>`; return; }
                     
             const dataKelas = MASTER_DATA_SISWA.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if(dataKelas.length === 0) { 
@@ -1400,31 +1244,84 @@
         }
 
         function validasiManual() {
-            const cat = document.getElementById('kategori-nilai-input').value; const rows = document.querySelectorAll('.row-nilai-manual');
-            if(rows.length === 0) return false; let isAllValid = true;
+            const cat = document.getElementById('kategori-nilai-input').value; 
+            const rows = document.querySelectorAll('.row-nilai-manual');
+            if(rows.length === 0) return false; 
+            
+            let isAllValid = true;
+            let hasFilled = false; // CEK ADA YANG DIISI ATAU TIDAK
+
             rows.forEach((row, idx) => {
-                const input = row.querySelector('.val-input-nilai'); const errMsg = document.getElementById(`err-man-${idx}`); const valRes = checkNilaiRule(input.value, cat);
-                if(valRes !== "valid") { input.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20'); input.classList.remove('border-gray-300','border-green-500'); errMsg.innerText = valRes; errMsg.classList.remove('hidden'); isAllValid = false; } 
-                else { input.classList.remove('border-red-500', 'bg-red-50', 'border-gray-300', 'dark:bg-red-900/20'); input.classList.add('border-green-500'); errMsg.classList.add('hidden'); }
+                const input = row.querySelector('.val-input-nilai'); 
+                const errMsg = document.getElementById(`err-man-${idx}`); 
+                const val = input.value.trim();
+                
+                if (val === "") {
+                    // Abaikan yang kosong
+                    input.classList.remove('border-red-500', 'bg-red-50', 'dark:bg-red-900/20', 'border-green-500');
+                    input.classList.add('border-gray-300');
+                    errMsg.classList.add('hidden');
+                    return; 
+                }
+                
+                hasFilled = true;
+                const valRes = checkNilaiRule(val, cat);
+                if(valRes !== "valid") { 
+                    input.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20'); 
+                    input.classList.remove('border-gray-300','border-green-500'); 
+                    errMsg.innerText = valRes; 
+                    errMsg.classList.remove('hidden'); 
+                    isAllValid = false; 
+                } else { 
+                    input.classList.remove('border-red-500', 'bg-red-50', 'border-gray-300', 'dark:bg-red-900/20'); 
+                    input.classList.add('border-green-500'); 
+                    errMsg.classList.add('hidden'); 
+                }
             });
-            if(isAllValid) showToast('Validasi sukses! Data siap disimpan.', 'success'); else showToast('Ada format nilai yang salah.', 'error'); return isAllValid;
+
+            if (!hasFilled) {
+                showToast('Isi minimal 1 nilai siswa sebelum menyimpan.', 'warning');
+                return false;
+            }
+
+            if(!isAllValid) showToast('Ada format nilai yang salah.', 'error'); 
+            return isAllValid && hasFilled;
         }
 
         async function simpanNilaiManual() {
             if(!validasiManual()) return;
             const cat = document.getElementById('kategori-nilai-input').value; const kelas = document.getElementById('filter-kelas-input').value;
             const rows = document.querySelectorAll('.row-nilai-manual'); let payloadArray = []; let tableName = cat;
+            
             rows.forEach((row) => {
-                const nis = row.querySelector('.attr-nis').innerText.replace('NIS:','').trim(); const nama = row.querySelector('.attr-nama').innerText.replace('Nama Lengkap:','').trim(); const val = row.querySelector('.val-input-nilai').value.trim();
+                const val = row.querySelector('.val-input-nilai').value.trim();
+                if (val === "") return; // SKIP YANG KOSONG
+                
+                const nis = row.querySelector('.attr-nis').innerText.replace('NIS:','').trim(); const nama = row.querySelector('.attr-nama').innerText.replace('Nama Lengkap:','').trim(); 
                 let obj = { NIS: nis, Nama_Siswa: nama, Kelas: kelas };
                 if(tableName==="NilaiMapel") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Nilai_Akhir = val; }
                 else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } 
                 else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
                 payloadArray.push(obj);
             });
-            isSyncing = true; startProgress('app-progress'); showToast('Menyimpan nilai ke server...', 'info');
-            try { const json = await fetchFromGoogle("insertNilaiBulk", tableName, payloadArray); if(json.status === 'success') { showToast("Nilai berhasil disimpan!", 'success'); await manualSync(); } else showToast(json.message, 'error'); } catch(e) { showToast("Gagal koneksi.", 'error'); }
-            isSyncing = false; endProgress('app-progress');
+            
+            // OPTIMISTIC UI: Update lokal langsung & nama otomatis hilang
+            payloadArray.forEach(obj => {
+                if(!ALL_NILAI_DATA[tableName]) ALL_NILAI_DATA[tableName] = [];
+                ALL_NILAI_DATA[tableName].push(obj);
+            });
+            
+            // Masukkan ke Antrean
+            OFFLINE_SYNC_QUEUE.push({ action: "insertNilaiBulk", table: tableName, payload: payloadArray });
+            localStorage.setItem('eraport_sync_queue', JSON.stringify(OFFLINE_SYNC_QUEUE));
+            
+            // Update UI
+            showToast(`Berhasil menyimpan nilai untuk ${payloadArray.length} siswa!`, 'success');
+            renderInputNilai(); 
+            updateDashboardAndData();
+            
+            // Proses Antrean
+            processSyncQueue();
         }
 
         let excelTimer; document.getElementById('inp-excel-nilai').addEventListener('input', (e) => { clearTimeout(excelTimer); excelTimer = setTimeout(() => { const l = e.target.value.trim().split('\n').filter(x => x).length; document.getElementById('info-excel-nilai').innerText = `${l} baris terdeteksi.`; }, 300); });
@@ -1454,9 +1351,24 @@
                 if(tableName==="NilaiMapel") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Nilai_Akhir = val; } else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
                 payloadArray.push(obj);
             });
-            isSyncing = true; startProgress('app-progress'); showToast('Memproses nilai massal...', 'info');
-            try { const json = await fetchFromGoogle("insertNilaiBulk", tableName, payloadArray); if(json.status === 'success') { showToast("Nilai excel disimpan!", 'success'); document.getElementById('inp-excel-nilai').value=""; await manualSync(); } else showToast(json.message, 'error'); } catch(e) { showToast("Gagal koneksi.", 'error'); }
-            isSyncing = false; endProgress('app-progress');
+            
+            // OPTIMISTIC UI: Update lokal langsung
+            payloadArray.forEach(obj => {
+                if(!ALL_NILAI_DATA[tableName]) ALL_NILAI_DATA[tableName] = [];
+                // Remove existing if any
+                ALL_NILAI_DATA[tableName] = ALL_NILAI_DATA[tableName].filter(n => n.NIS !== obj.NIS || (n.Mata_Pelajaran && n.Mata_Pelajaran !== obj.Mata_Pelajaran));
+                ALL_NILAI_DATA[tableName].push(obj);
+            });
+            
+            OFFLINE_SYNC_QUEUE.push({ action: "insertNilaiBulk", table: tableName, payload: payloadArray });
+            localStorage.setItem('eraport_sync_queue', JSON.stringify(OFFLINE_SYNC_QUEUE));
+            
+            showToast("Nilai excel masuk antrean!", 'success'); 
+            document.getElementById('inp-excel-nilai').value=""; 
+            renderInputNilai();
+            updateDashboardAndData();
+            
+            processSyncQueue();
         }
 
         function renderDaftarNilai() {
@@ -1559,7 +1471,7 @@
 
         function closeModalEditNilai() { const modal = document.getElementById('modal-edit-nilai'); const content = document.getElementById('modal-edit-nilai-content'); content.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200); }
 
-        async function submitEditNilaiServer(e) {
+        function submitEditNilaiServer(e) {
             e.preventDefault();
             const nis = document.getElementById('edit-nilai-nis').value; const nama = document.getElementById('edit-nilai-nama').value; const kelas = document.getElementById('edit-nilai-kelas').value; const cat = document.getElementById('edit-nilai-kategori').value; const mapel = document.getElementById('edit-nilai-mapel').value; 
             const val = (cat === "NilaiCP" || cat === "NilaiKokurikuler") ? document.getElementById('edit-nilai-val-area').value : document.getElementById('edit-nilai-val').value;
@@ -1568,15 +1480,31 @@
             let obj = { NIS: nis, Nama_Siswa: nama, Kelas: kelas };
             if(cat==="NilaiMapel") { obj.Mata_Pelajaran = mapel; obj.Nilai_Akhir = val; } else if(cat==="NilaiCP") { obj.Mata_Pelajaran = mapel; obj.Deskripsi_CP = val; } else if(cat==="NilaiEkskul") obj.Data_Ekskul = val; else if(cat==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
 
-            closeModalEditNilai(); isSyncing = true; startProgress('app-progress'); showToast('Menyimpan perubahan...', 'info');
-            try { const json = await fetchFromGoogle("insertNilaiSingle", cat, obj); if(json.status === 'success') { showToast("Nilai berhasil diupdate!", 'success'); await manualSync(); } else showToast("Gagal update.", 'error'); } catch(e) { showToast("Error koneksi.", 'error'); }
-            isSyncing = false; endProgress('app-progress');
+            // Optimistic UI
+            if(!ALL_NILAI_DATA[cat]) ALL_NILAI_DATA[cat] = [];
+            ALL_NILAI_DATA[cat] = ALL_NILAI_DATA[cat].filter(n => n.NIS !== obj.NIS || (n.Mata_Pelajaran && n.Mata_Pelajaran !== obj.Mata_Pelajaran));
+            ALL_NILAI_DATA[cat].push(obj);
+
+            OFFLINE_SYNC_QUEUE.push({ action: "insertNilaiSingle", table: cat, payload: obj });
+            localStorage.setItem('eraport_sync_queue', JSON.stringify(OFFLINE_SYNC_QUEUE));
+
+            closeModalEditNilai(); showToast("Perubahan antrean disimpan!", 'success');
+            renderTabelKelolaNilai();
+            processSyncQueue();
         }
 
-        async function hapusNilaiServer(tableName, nis, mapel) {
-            if(!confirm(`Yakin menghapus nilai siswa NIS ${nis}?`)) return; isSyncing = true; startProgress('app-progress'); showToast('Menghapus data di server...', 'warning');
-            try { const json = await fetchFromGoogle("deleteNilai", tableName, { NIS: nis, Mata_Pelajaran: mapel }); if(json.status === 'success') { showToast("Nilai dihapus!", 'success'); await manualSync(); } else showToast("Gagal hapus.", 'error'); } catch(e) { showToast("Error koneksi.", 'error'); }
-            isSyncing = false; endProgress('app-progress');
+        function hapusNilaiServer(tableName, nis, mapel) {
+            if(!confirm(`Yakin menghapus nilai siswa NIS ${nis}?`)) return; 
+            
+            // Optimistic Update
+            ALL_NILAI_DATA[tableName] = ALL_NILAI_DATA[tableName].filter(n => n.NIS !== nis || (n.Mata_Pelajaran && n.Mata_Pelajaran !== mapel));
+            
+            OFFLINE_SYNC_QUEUE.push({ action: "deleteNilai", table: tableName, payload: { NIS: nis, Mata_Pelajaran: mapel } });
+            localStorage.setItem('eraport_sync_queue', JSON.stringify(OFFLINE_SYNC_QUEUE));
+
+            showToast("Nilai dimasukkan ke antrean hapus!", 'warning');
+            renderTabelKelolaNilai();
+            processSyncQueue();
         }
 
         function updatePendingUI() { 
@@ -1654,16 +1582,6 @@
             btn.disabled = false; isSyncing = false; endProgress('app-progress'); 
         }
 
-        function showPage(p) { 
-            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden')); 
-            const page = document.getElementById(p); 
-            if(page) page.classList.remove('hidden'); 
-            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400')); const m = document.getElementById('menu-'+p); 
-            if(m) m.classList.add('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400'); 
-            const pageTitle = document.getElementById('page-title');
-            if(pageTitle) pageTitle.innerText = p.replace('-', ' ').toUpperCase(); 
-            if(window.innerWidth < 768) toggleSidebar();
-        }
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
     </script>
 </body>
