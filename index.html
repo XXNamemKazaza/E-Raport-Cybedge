@@ -209,8 +209,19 @@
                         </li>
                     </div>
 
+                    <!-- STRUKTUR ADMIN BARU -->
                     <div id="sidebar-admin-menu" class="hidden mt-4">
                         <p class="px-6 py-2 text-xs font-bold text-indigo-400 dark:text-gray-500 uppercase">Tugas Admin</p>
+                        
+                        <li id="menu-item-man-admin-container">
+                            <div onclick="toggleSubmenu('submenu-manajemen-admin')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition cursor-pointer flex justify-between items-center text-indigo-100"><div><i class="fa-solid fa-gears mr-3 w-5 text-indigo-300"></i> Manajemen Data</div><i class="fa-solid fa-chevron-down text-sm"></i></div>
+                            <ul id="submenu-manajemen-admin" class="submenu bg-indigo-950/50 dark:bg-black/20">
+                                <li><a href="#" onclick="showPage('manajemen-siswa')" class="block px-14 py-2.5 text-sm hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Data Siswa</a></li>
+                                <li><a href="#" onclick="showPage('kelola-nilai')" class="block px-14 py-2.5 text-sm hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Kelola Nilai</a></li>
+                                <li><a href="#" onclick="showPage('manajemen-pengguna')" class="block px-14 py-2.5 text-sm hover:text-white text-indigo-300 transition hover:bg-indigo-800/50 dark:hover:bg-gray-800/50">Data Pengguna</a></li>
+                            </ul>
+                        </li>
+
                         <li>
                             <div onclick="toggleSubmenu('submenu-cetak')" class="block px-6 py-3 border-l-4 border-transparent hover:bg-indigo-800 dark:hover:bg-gray-800 transition cursor-pointer flex justify-between items-center text-yellow-300"><div><i class="fa-solid fa-print mr-3 w-5"></i> Cetak Raport</div><i class="fa-solid fa-chevron-down text-sm"></i></div>
                             <ul id="submenu-cetak" class="submenu bg-indigo-950/50 dark:bg-black/20">
@@ -340,6 +351,35 @@
                         <div id="container-pemantauan-wali" class="hidden mt-2">
                             <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 tracking-wider">KELAS PERWALIAN (<span id="label-wali-kelas" class="text-indigo-600 dark:text-indigo-400"></span>)</p>
                             <div id="list-pemantauan-wali" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION DATA PENGGUNA (GURU) KHUSUS ADMIN -->
+                <section id="manajemen-pengguna" class="page-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2"><i class="fa-solid fa-user-tie mr-2 text-indigo-500"></i> Kelola Data Pengguna (Guru)</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Daftar seluruh guru dan administrator yang terdaftar di dalam sistem.</p>
+                        
+                        <div class="mb-5 relative">
+                            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="text" id="search-pengguna" onkeyup="renderTabelPengguna()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Cari nama guru, mapel, atau kelas...">
+                        </div>
+
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
+                                    <tr>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap & User</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Role</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Mata Pelajaran</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Kelas Ajar</th>
+                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Wali Kelas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-pengguna" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -636,6 +676,35 @@
                     </div>
                 </section>
 
+                <!-- SECTION DATA PENGGUNA (GURU) KHUSUS ADMIN -->
+                <section id="manajemen-pengguna" class="page-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2"><i class="fa-solid fa-user-tie mr-2 text-indigo-500"></i> Kelola Data Pengguna (Guru)</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Daftar seluruh guru dan administrator yang terdaftar di dalam sistem.</p>
+                        
+                        <div class="mb-5 relative">
+                            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="text" id="search-pengguna" onkeyup="renderTabelPengguna()" class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-3 pl-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Cari nama guru, mapel, atau kelas...">
+                        </div>
+
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 hidden md:table-header-group">
+                                    <tr>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Nama Lengkap & User</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Role</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-48">Mata Pelajaran</th>
+                                        <th class="px-4 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-40">Kelas Ajar</th>
+                                        <th class="px-4 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase w-32">Wali Kelas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-pengguna" class="block md:table-row-group divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="cetak-massal" class="page-section hidden animate-fade-in"><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-center gap-6 text-center md:text-left"><div class="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-400 text-4xl"><i class="fa-solid fa-print"></i></div><div><h3 class="font-bold text-2xl mb-2 text-gray-800 dark:text-white">Cetak Raport Massal</h3><p class="text-gray-500 dark:text-gray-400">Fitur ini sedang dalam pengembangan.</p></div></div></section>
                 <section id="cetak-individu" class="page-section hidden animate-fade-in"><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-center gap-6 text-center md:text-left"><div class="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-400 text-4xl"><i class="fa-solid fa-user-graduate"></i></div><div><h3 class="font-bold text-2xl mb-2 text-gray-800 dark:text-white">Cetak Raport Individu</h3><p class="text-gray-500 dark:text-gray-400">Fitur ini sedang dalam pengembangan.</p></div></div></section>
             </main>
@@ -816,7 +885,8 @@
 
             if(SESSION_DATA.Role === 'Admin') { 
                 document.getElementById('dash-info-role').innerHTML = `<i class="fa-solid fa-shield-halved text-indigo-500 dark:text-indigo-400 mr-2"></i> Akses Admin: Mencetak dan Kelola Master Data.`; 
-                document.getElementById('sidebar-guru-menu').classList.add('hidden'); document.getElementById('sidebar-admin-menu').classList.remove('hidden'); document.getElementById('menu-item-man-siswa-container').classList.remove('hidden'); document.getElementById('menu-item-data-siswa-link').classList.remove('hidden'); document.getElementById('menu-item-kelola-nilai-link').classList.remove('hidden');
+                document.getElementById('sidebar-guru-menu').classList.add('hidden'); 
+                document.getElementById('sidebar-admin-menu').classList.remove('hidden'); 
             } else { 
                 document.getElementById('dash-info-role').innerHTML = `<i class="fa-solid fa-book-open text-indigo-500 dark:text-indigo-400 mr-2"></i> Guru Mata Pelajaran: <strong class="text-gray-800 dark:text-gray-200 ml-1">${SESSION_DATA.Mapel}</strong>`; 
                 
@@ -825,9 +895,8 @@
                 if(SESSION_DATA.Kelas_Diajar !== "-") { infoContainer.innerHTML = SESSION_DATA.Kelas_Diajar.split(',').map(k => `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-bold border border-gray-200 dark:border-gray-600 shadow-sm">${k.trim()}</span>`).join(''); } 
                 else { infoContainer.innerHTML = `<span class="text-xs text-gray-400 italic">Belum ada kelas ajar.</span>`; }
 
-                document.getElementById('sidebar-guru-menu').classList.remove('hidden'); document.getElementById('sidebar-admin-menu').classList.add('hidden'); 
-                document.getElementById('menu-item-man-siswa-container').classList.remove('hidden'); document.getElementById('menu-item-kelola-nilai-link').classList.remove('hidden');
-                if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { document.getElementById('menu-item-data-siswa-link').classList.remove('hidden'); } else { document.getElementById('menu-item-data-siswa-link').classList.add('hidden'); }
+                document.getElementById('sidebar-guru-menu').classList.remove('hidden'); 
+                document.getElementById('sidebar-admin-menu').classList.add('hidden'); 
             } 
             
             manualSync(); if(autoSyncTimer) clearInterval(autoSyncTimer); autoSyncTimer = setInterval(() => { if (!isSyncing) silentSync(); }, 60000);
@@ -927,7 +996,6 @@
                 } else { contWali.classList.add('hidden'); }
             } else { boxPemantauan.classList.add('hidden'); }
 
-            // Extract ALL unique classes from registered users for dropdowns
             let allClasses = new Set();
             MASTER_DATA_PENGGUNA.forEach(g => {
                 if(g.Kelas_Diajar && g.Kelas_Diajar !== "-") { g.Kelas_Diajar.split(',').forEach(c => allClasses.add(c.trim().toUpperCase())); }
@@ -942,12 +1010,10 @@
                 kelasSelect = kelasSelect.filter(k => arrKelasDiajar.includes(k.toUpperCase())); 
             }
             
-            // Build Dashboard Filter Buttons
             const btnContainer = document.getElementById('dash-filter-buttons');
             let btnHtml = `<button onclick="setDashFilter('Semua')" id="btn-filt-Semua" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white">SEMUA</button>`;
             kelasSelect.forEach(k => { btnHtml += `<button onclick="setDashFilter('${k}')" id="btn-filt-${k}" class="px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">${k}</button>`; });
             if(btnContainer) btnContainer.innerHTML = btnHtml;
-            // Activate current filter visually
             if(document.getElementById('btn-filt-'+activeDashFilter)) { document.querySelectorAll("[id^='btn-filt-']").forEach(btn => btn.className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"); document.getElementById('btn-filt-'+activeDashFilter).className = "px-4 py-1.5 rounded-full text-sm font-bold shadow transition bg-indigo-600 text-white"; }
 
             ['filter-kelas-daftar', 'filter-kelas-input', 'filter-kelas-daftarnilai', 'pk-kelas'].forEach(id => {
@@ -966,7 +1032,42 @@
                 selManajemen.innerHTML = `<option value="Semua">Semua Kelas</option>`; kelasOpt.forEach(k => selManajemen.innerHTML += `<option value="${k}">${k}</option>`); 
             }
             
-            filterTabelSiswa(); onClassChangeInput(); onClassChangeDaftarNilai(); onClassChangePK(); renderTabelManajemen(); 
+            filterTabelSiswa(); onClassChangeInput(); onClassChangeDaftarNilai(); onClassChangePK(); renderTabelManajemen(); renderTabelPengguna();
+        }
+
+        function renderTabelPengguna() {
+            const q = (document.getElementById('search-pengguna')?.value || "").toLowerCase();
+            const tbody = document.getElementById('tbody-pengguna');
+            if(!tbody) return;
+
+            let data = MASTER_DATA_PENGGUNA;
+            if(q) {
+                data = data.filter(g => 
+                    (g.Nama_Lengkap && g.Nama_Lengkap.toLowerCase().includes(q)) || 
+                    (g.Mapel && g.Mapel.toLowerCase().includes(q)) ||
+                    (g.Kelas_Diajar && g.Kelas_Diajar.toLowerCase().includes(q)) ||
+                    (g.Wali_Kelas && g.Wali_Kelas.toLowerCase().includes(q))
+                );
+            }
+
+            if(data.length === 0){ 
+                tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Tidak ada data pengguna.</td></tr>`; 
+                return; 
+            }
+
+            tbody.innerHTML = data.map(g => {
+                let roleBadge = g.Role === 'Admin' ? `<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded text-xs font-bold">Admin</span>` : `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold">Guru Mapel</span>`;
+                let waliBadge = (g.Wali_Kelas && g.Wali_Kelas !== "-") ? `<span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-1 rounded text-xs font-bold">${g.Wali_Kelas}</span>` : `<span class="text-gray-400 dark:text-gray-500">-</span>`;
+                
+                return `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0">
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm font-bold md:font-semibold flex flex-col md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase mb-1">Nama:</span> <span class="text-indigo-700 dark:text-indigo-300">${g.Nama_Lengkap}</span><span class="text-xs text-gray-400 dark:text-gray-500 block mt-0.5">User: ${g.Username}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell items-center"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Role:</span> <span>${roleBadge}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Mapel:</span> <span class="font-medium text-gray-800 dark:text-gray-200">${g.Mapel}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Kelas Ajar:</span> <span class="text-right whitespace-normal max-w-[200px] break-words text-gray-700 dark:text-gray-300">${g.Kelas_Diajar}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-sm md:text-center flex justify-between md:table-cell border-t border-gray-100 dark:border-gray-700 md:border-none mt-2 pt-2 md:mt-0"><span class="md:hidden font-bold text-gray-500 text-xs uppercase">Wali Kelas:</span> <span>${waliBadge}</span></td>
+                </tr>`;
+            }).join('');
         }
 
         function filterTabelSiswa() {
@@ -1159,7 +1260,6 @@
             let targetData = (ALL_NILAI_DATA[catSelect] || []).filter(n => String(n.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if (SESSION_DATA.Role !== 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) { targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel); }
             
-            // FILTER MAPEL KHUSUS ADMIN
             if (SESSION_DATA.Role === 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) {
                 const adminMapelFilter = document.getElementById('pk-mapel-admin')?.value;
                 if (adminMapelFilter) { targetData = targetData.filter(n => n.Mata_Pelajaran === adminMapelFilter); }
@@ -1243,7 +1343,6 @@
             if(k !== "Semua") data = data.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if(q) data = data.filter(s => s.Nama_Lengkap.toLowerCase().includes(q) || String(s.NIS).includes(q));
             
-            // --- INFO WALI KELAS UNTUK ADMIN ---
             const infoBox = document.getElementById('admin-info-walikelas');
             if(SESSION_DATA.Role === 'Admin' && k !== "Semua") {
                 const wali = MASTER_DATA_PENGGUNA.find(g => g.Wali_Kelas && g.Wali_Kelas.toUpperCase() === k.toUpperCase());
@@ -1256,7 +1355,6 @@
                 document.getElementById('ai-total').innerText = data.length;
                 infoBox.classList.remove('hidden');
             } else if(infoBox) { infoBox.classList.add('hidden'); }
-            // -----------------------------------
 
             if(data.length === 0){ tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Tidak ada data siswa.</td></tr>`; return; }
             tbody.innerHTML = data.map(s => {
