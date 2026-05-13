@@ -752,7 +752,11 @@
         }
 
         function onClassChangeInput() {
-            const kls = document.getElementById('filter-kelas-input').value; const catSel = document.getElementById('kategori-nilai-input'); const notif = document.getElementById('notif-wali-input');
+            const elKls = document.getElementById('filter-kelas-input');
+            if(!elKls) return; // Guard clause ditambahkan
+            const kls = elKls.value; 
+            const catSel = document.getElementById('kategori-nilai-input'); 
+            const notif = document.getElementById('notif-wali-input');
             if (!kls) { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); renderInputNilai(); return; }
             catSel.disabled = false;
             const isWali = (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
@@ -762,7 +766,11 @@
         }
 
         function onClassChangeDaftarNilai() {
-            const kls = document.getElementById('filter-kelas-daftarnilai').value; const catSel = document.getElementById('cat-daftar-nilai'); const notif = document.getElementById('notif-wali-daftar');
+            const elKls = document.getElementById('filter-kelas-daftarnilai');
+            if(!elKls) return; // Guard clause ditambahkan
+            const kls = elKls.value; 
+            const catSel = document.getElementById('cat-daftar-nilai'); 
+            const notif = document.getElementById('notif-wali-daftar');
             const isWali = (kls !== "Semua" && SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
             if (isWali) notif.classList.remove('hidden'); else notif.classList.add('hidden');
             let currentVal = catSel.value;
@@ -772,7 +780,11 @@
         }
 
         function onClassChangePK() {
-            const kls = document.getElementById('pk-kelas').value; const catSel = document.getElementById('pk-kategori'); const notif = document.getElementById('notif-wali-pk');
+            const elKls = document.getElementById('pk-kelas');
+            if(!elKls) return; // Guard clause ditambahkan
+            const kls = elKls.value; 
+            const catSel = document.getElementById('pk-kategori'); 
+            const notif = document.getElementById('notif-wali-pk');
             if (!kls || kls === "Semua") { catSel.disabled = true; catSel.innerHTML = `<option value="">-- Pilih Kelas Terlebih Dahulu --</option>`; notif.classList.add('hidden'); onChangeCategoryPK(); return; }
             catSel.disabled = false;
             const isWali = (SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas.toUpperCase() === kls.toUpperCase());
@@ -782,7 +794,8 @@
         }
 
         function onChangeCategoryPK() {
-            const cat = document.getElementById('pk-kategori').value;
+            const cat = document.getElementById('pk-kategori')?.value;
+            if(!cat) return;
             const containerMapelAdmin = document.getElementById('container-filter-mapel-admin');
             const selectMapelAdmin = document.getElementById('pk-mapel-admin');
 
@@ -793,7 +806,7 @@
                 selectMapelAdmin.innerHTML = `<option value="">Semua Mata Pelajaran</option>` + [...mapels].sort().map(m => `<option value="${m}">${m}</option>`).join('');
                 if([...mapels].includes(currentVal)) selectMapelAdmin.value = currentVal;
                 containerMapelAdmin.classList.remove('hidden');
-            } else {
+            } else if(containerMapelAdmin && selectMapelAdmin) {
                 containerMapelAdmin.classList.add('hidden');
                 selectMapelAdmin.value = "";
             }
@@ -1114,7 +1127,10 @@
             if(SESSION_DATA.Role !== 'Admin') { const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); d = d.filter(s => arr.includes(String(s.Kelas).trim().toUpperCase())); }
             if(k && k !== "Semua") d = d.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase()); 
             if(q) d = d.filter(s => s.Nama_Lengkap.toLowerCase().includes(q) || String(s.NIS).includes(q));
+            
             const t = document.getElementById('tbody-siswa'); 
+            if (!t) return; // <--- GUARD CLAUSE DITAMBAHKAN
+            
             t.innerHTML = d.length===0 ? `<tr class="block md:table-row"><td colspan="5" class="px-6 py-6 text-center text-gray-400 block md:table-cell">Tidak ada data.</td></tr>` 
             : d.map(s => `
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0">
@@ -1142,7 +1158,9 @@
         function closeProfileMenu(e) { if(!e.target.closest('.profile-dropdown-container')) { const box = document.getElementById('profile-menu-box'); if(box) box.classList.add('hidden'); } }
 
         function renderInputNilai() {
-            const k = document.getElementById('filter-kelas-input').value; const cat = document.getElementById('kategori-nilai-input').value; const tbody = document.getElementById('tbody-input-manual');
+            const k = document.getElementById('filter-kelas-input')?.value; const cat = document.getElementById('kategori-nilai-input')?.value; const tbody = document.getElementById('tbody-input-manual');
+            if(!tbody) return; // Guard clause ditambahkan
+            
             if(!k || !cat) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Pilih kelas dan kategori terlebih dahulu.</td></tr>`; return; }
             if(isSyncing) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="4" class="px-4 py-8 text-center text-indigo-400 italic block md:table-cell"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Sedang memuat data dari server...</td></tr>`; return; }
                     
@@ -1249,8 +1267,10 @@
         }
 
         function renderDaftarNilai() {
-            const catSelect = document.getElementById('cat-daftar-nilai').value; const k = document.getElementById('filter-kelas-daftarnilai').value; const q = document.getElementById('search-daftar-nilai').value.toLowerCase();
+            const catSelect = document.getElementById('cat-daftar-nilai')?.value; const k = document.getElementById('filter-kelas-daftarnilai')?.value; const q = document.getElementById('search-daftar-nilai')?.value.toLowerCase() || "";
             const tbody = document.getElementById('tbody-daftar-nilai'); const thInfo = document.getElementById('th-info-tambahan');
+            
+            if(!tbody) return; // Guard clause
             
             if(k === "Semua" && !catSelect) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Pilih kategori untuk memuat data.</td></tr>`; return; }
 
@@ -1275,7 +1295,7 @@
                 let infoCol = "-", nilaiCol = "-";
                 if(catSelect === "NilaiMapel") { infoCol = n.Mata_Pelajaran; nilaiCol = `<span class="font-bold text-indigo-700 dark:text-indigo-400 text-lg md:text-base">${n.Nilai_Akhir}</span>`; }
                 else if(catSelect === "NilaiCP") { infoCol = n.Mata_Pelajaran; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Deskripsi_CP||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm"><i class="fa-solid fa-eye"></i> Lihat CP</button>`; }
-                else if(catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = n.Data_Ekskul.split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm"><b>${parts[0].trim()}</b>: ${parts[1]?.trim()}</span>`; }); nilaiCol = ekskulArray.join(''); }
+                else if(catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = (n.Data_Ekskul||"").split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm"><b>${parts[0].trim()}</b>: ${parts[1]?.trim()}</span>`; }); nilaiCol = ekskulArray.join(''); }
                 else if(catSelect === "NilaiSikap") { infoCol = "Predikat"; nilaiCol = `<span class="font-bold text-green-600 dark:text-green-400 text-lg md:text-base">${n.Predikat_Sikap}</span>`; }
                 else if(catSelect === "NilaiKokurikuler") { infoCol = "Sudah Diisi"; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Keterangan_Kokurikuler||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm"><i class="fa-solid fa-eye"></i> Lihat Preview</button>`; }
                 
@@ -1368,17 +1388,17 @@
         }
 
         function updatePendingUI() { 
-    const count = PENDING_EDITS.length + PENDING_DELETES.length; 
-    const bar = document.getElementById('bar-pending-changes'); 
-    if(!bar) return; // ← tambah guard ini
-    if(count > 0) { 
-        const countEl = document.getElementById('text-pending-count');
-        if(countEl) countEl.innerText = count; 
-        bar.classList.remove('hidden'); 
-    } else { 
-        bar.classList.add('hidden'); 
-    } 
-}
+            const count = PENDING_EDITS.length + PENDING_DELETES.length; 
+            const bar = document.getElementById('bar-pending-changes'); 
+            if(!bar) return; // ← tambah guard ini
+            if(count > 0) { 
+                const countEl = document.getElementById('text-pending-count');
+                if(countEl) countEl.innerText = count; 
+                bar.classList.remove('hidden'); 
+            } else { 
+                bar.classList.add('hidden'); 
+            } 
+        }
         function batalPerubahanMassal() { MASTER_DATA_SISWA = JSON.parse(JSON.stringify(ORIGINAL_DATA_SISWA)); PENDING_EDITS = []; PENDING_DELETES = []; updatePendingUI(); renderTabelManajemen(); updateDashboardAndData(); showToast('Perubahan dibatalkan.', 'info'); }
         async function simpanPerubahanMassal() {
             isSyncing = true; startProgress('app-progress'); showToast('Menyinkronkan perubahan massal...', 'info');
@@ -1387,7 +1407,9 @@
         }
 
         function renderTabelManajemen() {
-            const k = document.getElementById('filter-kelas-manajemen')?.value || "Semua"; const q = (document.getElementById('search-manajemen')?.value || "").toLowerCase(); const tbody = document.getElementById('tbody-manajemen'); if(!tbody) return;
+            const k = document.getElementById('filter-kelas-manajemen')?.value || "Semua"; const q = (document.getElementById('search-manajemen')?.value || "").toLowerCase(); const tbody = document.getElementById('tbody-manajemen'); 
+            if(!tbody) return;
+            
             let data = MASTER_DATA_SISWA;
             if(SESSION_DATA.Role !== 'Admin') { if(SESSION_DATA.Wali_Kelas && SESSION_DATA.Wali_Kelas !== "-") { data = data.filter(s => String(s.Kelas).trim().toUpperCase() === String(SESSION_DATA.Wali_Kelas).trim().toUpperCase()); } else { data = []; } }
             if(k !== "Semua") data = data.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
@@ -1403,7 +1425,7 @@
                 document.getElementById('ai-L').innerText = data.filter(x=>x.Gender==='L').length;
                 document.getElementById('ai-P').innerText = data.filter(x=>x.Gender==='P').length;
                 document.getElementById('ai-total').innerText = data.length;
-                infoBox.classList.remove('hidden');
+                if(infoBox) infoBox.classList.remove('hidden');
             } else if(infoBox) { infoBox.classList.add('hidden'); }
 
             if(data.length === 0){ tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Tidak ada data siswa.</td></tr>`; return; }
@@ -1441,9 +1463,13 @@
         }
 
         function showPage(p) { 
-            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden')); const page = document.getElementById(p); page.classList.remove('hidden'); 
+            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden')); 
+            const page = document.getElementById(p); 
+            if(page) page.classList.remove('hidden'); 
             document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400')); const m = document.getElementById('menu-'+p); 
-            if(m) m.classList.add('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400'); document.getElementById('page-title').innerText = p.replace('-', ' ').toUpperCase(); 
+            if(m) m.classList.add('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400'); 
+            const pageTitle = document.getElementById('page-title');
+            if(pageTitle) pageTitle.innerText = p.replace('-', ' ').toUpperCase(); 
             if(window.innerWidth < 768) toggleSidebar();
         }
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
