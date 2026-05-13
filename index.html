@@ -62,13 +62,13 @@
     <!-- TOAST -->
     <div id="toast-container" class="fixed top-20 right-6 z-[90] flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- MODAL PREVIEW KOKU -->
+    <!-- MODAL PREVIEW KOKU & CP -->
     <div id="modal-preview-koku" class="fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-all duration-300" id="modal-koku-content">
-            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-eye mr-2"></i> Preview Kokurikuler</h3><button onclick="closeModalKoku()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fa-solid fa-eye mr-2"></i> Preview Teks</h3><button onclick="closeModalKoku()" class="text-white hover:text-red-300 transition"><i class="fa-solid fa-times text-xl"></i></button></div>
             <div class="p-6">
                 <p class="text-xs font-bold text-gray-400 uppercase mb-1">Nama Siswa</p><p class="text-lg font-bold text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2 mb-4" id="koku-nama-siswa">-</p>
-                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Detail Kokurikuler</p>
+                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Isi Deskripsi</p>
                 <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 leading-relaxed min-h-[100px] whitespace-pre-wrap shadow-inner" id="koku-teks-deskripsi">-</div>
                 <div class="mt-6 flex justify-end"><button onclick="closeModalKoku()" class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition shadow">Tutup Preview</button></div>
             </div>
@@ -110,7 +110,8 @@
                 
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
                     <label class="block text-sm font-bold text-indigo-700 dark:text-indigo-400 uppercase mb-2" id="label-input-edit-nilai">Input Nilai Baru</label>
-                    <input type="text" id="edit-nilai-val" required class="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border-2 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500 font-bold text-lg outline-none transition text-gray-800 dark:text-white">
+                    <input type="text" id="edit-nilai-val" class="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border-2 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500 font-bold text-lg outline-none transition text-gray-800 dark:text-white">
+                    <textarea id="edit-nilai-val-area" class="hidden w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border-2 rounded-lg p-3 focus:ring-yellow-500 focus:border-yellow-500 font-bold text-base outline-none transition text-gray-800 dark:text-white resize-y min-h-[100px]" rows="3"></textarea>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" id="panduan-edit-nilai"></p>
                 </div>
                 
@@ -216,15 +217,10 @@
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4 relative profile-dropdown-container">
-                    <!-- Mobil Sync Icon -->
                     <div class="md:hidden flex items-center justify-center p-2 rounded-full cursor-pointer" onclick="manualSync()">
                          <div id="sync-dot-mobile" class="w-3 h-3 rounded-full synced shadow-sm border border-white dark:border-gray-800"></div>
                     </div>
-
-                    <!-- Theme Toggle -->
-                    <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition outline-none">
-                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
-                    </button>
+                    <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition outline-none"><i id="theme-icon" class="fa-solid fa-moon text-lg"></i></button>
 
                     <!-- Profile Avatar -->
                     <div class="flex items-center gap-3 bg-white dark:bg-gray-800 p-1.5 md:p-2 rounded-full md:rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition shadow-sm" onclick="toggleProfileMenu(event)">
@@ -292,6 +288,7 @@
                                 <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Kategori Nilai</label>
                                 <select id="kategori-nilai-input" onchange="renderInputNilai()" class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-700 dark:text-indigo-400 outline-none transition">
                                     <option value="NilaiMapel">Nilai Mata Pelajaran</option>
+                                    <option value="NilaiCP">Nilai Capaian Kompetensi (CP)</option>
                                     <option value="NilaiEkskul">Nilai Ekstrakurikuler</option>
                                     <option value="NilaiKokurikuler">Nilai Kokurikuler</option>
                                     <option value="NilaiSikap">Nilai Sikap / BK</option>        
@@ -363,7 +360,7 @@
                     <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                         <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-book-open text-indigo-500 mr-3"></i> Rekapitulasi Daftar Nilai</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Kategori</label><select id="cat-daftar-nilai" onchange="renderDaftarNilai()" class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none"><option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiEkskul">Ekstrakurikuler</option><option value="NilaiKokurikuler">Kokurikuler</option><option value="NilaiSikap">Sikap / BK</option></select></div>
+                            <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Kategori</label><select id="cat-daftar-nilai" onchange="renderDaftarNilai()" class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none"><option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiCP">Nilai Capaian Kompetensi (CP)</option><option value="NilaiEkskul">Ekstrakurikuler</option><option value="NilaiKokurikuler">Kokurikuler</option><option value="NilaiSikap">Sikap / BK</option></select></div>
                             <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Kelas</label><select id="filter-kelas-daftarnilai" onchange="renderDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"><option value="Semua">Semua Kelas</option></select></div>
                             <div><label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Pencarian</label><div class="relative"><i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i><input type="text" id="search-daftar-nilai" onkeyup="renderDaftarNilai()" class="w-full rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 border p-3 pl-10 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Cari nama / NIS..."></div></div>
                         </div>
@@ -490,6 +487,7 @@
                                 <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Pilih Kategori</label>
                                 <select id="pk-kategori" onchange="renderTabelKelolaNilai()" class="w-full rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 border p-3 text-sm font-bold text-indigo-700 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 outline-none">
                                     <option value="NilaiMapel">Nilai Mata Pelajaran</option>
+                                    <option value="NilaiCP">Nilai Capaian Kompetensi (CP)</option>
                                     <option value="NilaiEkskul">Ekstrakurikuler</option>
                                     <option value="NilaiKokurikuler">Kokurikuler</option>
                                     <option value="NilaiSikap">Sikap / BK</option>
@@ -551,7 +549,6 @@
                 localStorage.setItem('theme', 'dark');
             }
         }
-        // Load theme on startup
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
             document.getElementById('theme-icon')?.classList.replace('fa-moon', 'fa-sun');
@@ -562,12 +559,10 @@
             const sidebar = document.getElementById('app-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             if (sidebar.classList.contains('-translate-x-full')) {
-                // Buka sidebar
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
                 setTimeout(() => overlay.classList.add('opacity-100'), 10);
             } else {
-                // Tutup sidebar
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.remove('opacity-100');
                 setTimeout(() => overlay.classList.add('hidden'), 300);
@@ -581,7 +576,7 @@
 
         let SESSION_DATA = null;
         let MASTER_DATA_SISWA = []; let ORIGINAL_DATA_SISWA = []; let MASTER_DATA_PENGGUNA = [];
-        let ALL_NILAI_DATA = { NilaiMapel: [], NilaiEkskul: [], NilaiKokurikuler: [], NilaiSikap: [] };
+        let ALL_NILAI_DATA = { NilaiMapel: [], NilaiEkskul: [], NilaiKokurikuler: [], NilaiSikap: [], NilaiCP: [] };
         
         let PENDING_EDITS = []; let PENDING_DELETES = [];
         let autoSyncTimer = null; let activeDashFilter = "Semua"; let isSyncing = false;
@@ -708,7 +703,8 @@
             if (isSyncing) return;
             isSyncing = true; setSyncStatus('syncing');
             try {
-                const sheetNames = ["DataSiswa","DataPengguna","NilaiMapel","NilaiEkskul","NilaiSikap","NilaiKokurikuler"];
+                // PENAMBAHAN SHEET NilaICP
+                const sheetNames = ["DataSiswa","DataPengguna","NilaiMapel","NilaiEkskul","NilaiSikap","NilaiKokurikuler","NilaiCP"];
                 const results = await Promise.all(sheetNames.map(name => fetchFromGoogle("readAll",null,null,name)));
                 const allOk = results.every(r => r && r.status==='success');
                 if (!allOk) { const fi = results.findIndex(r=>!r||r.status!=='success'); throw new Error(`Gagal baca: ${sheetNames[fi]}`); }
@@ -769,7 +765,6 @@
             filterTabelSiswa(); renderInputNilai(); renderTabelManajemen(); renderDaftarNilai(); if (typeof renderTabelKelolaNilai === "function") renderTabelKelolaNilai();
         }
 
-        // --- Modifikasi String Render Tabel agar support Card di Mobile (Tailwind based) ---
         function filterTabelSiswa() {
             const k = document.getElementById('filter-kelas-daftar').value; const q = document.getElementById('search-siswa-daftar').value.toLowerCase(); let d = MASTER_DATA_SISWA;
             if(SESSION_DATA.Role !== 'Admin') { const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); d = d.filter(s => arr.includes(String(s.Kelas).trim().toUpperCase())); }
@@ -799,9 +794,11 @@
             
             if(type === 'manual') { 
                 btnMan.className = btnOn; btnExc.className = btnOff; areaMan.classList.remove('hidden'); areaExc.classList.add('hidden'); 
-                catSelect.innerHTML = `<option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiEkskul">Ekstrakurikuler</option><option value="NilaiKokurikuler">Kokurikuler</option><option value="NilaiSikap">Sikap / BK</option>`;
+                // PENAMBAHAN MENU CP HANYA UNTUK MANUAL
+                catSelect.innerHTML = `<option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiCP">Nilai Capaian Kompetensi (CP)</option><option value="NilaiEkskul">Ekstrakurikuler</option><option value="NilaiKokurikuler">Kokurikuler</option><option value="NilaiSikap">Sikap / BK</option>`;
             } else { 
                 btnExc.className = btnOn; btnMan.className = btnOff; areaExc.classList.remove('hidden'); areaMan.classList.add('hidden'); 
+                // MENU EXCEL TETAP SAMA
                 catSelect.innerHTML = `<option value="NilaiMapel">Nilai Mata Pelajaran</option><option value="NilaiSikap">Nilai Sikap / BK</option>`;
             }
             renderInputNilai();
@@ -834,7 +831,9 @@
             
             let tableName = cat;
             let existingGrades = ALL_NILAI_DATA[tableName] || [];
-            if(tableName === "NilaiMapel") existingGrades = existingGrades.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel);
+            
+            // CP juga dicek berdasarkan Mapel
+            if(tableName === "NilaiMapel" || tableName === "NilaiCP") existingGrades = existingGrades.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel);
             
             const gradedNIS = existingGrades.map(n => String(n.NIS).trim());
             const dataBelumDinilai = dataKelas.filter(s => !gradedNIS.includes(String(s.NIS).trim()));
@@ -844,20 +843,33 @@
                 return;
             }
 
-            let placeholderText = "0-100"; if(cat === "NilaiEkskul") placeholderText = "Pramuka:A, Tari:B"; else if(cat === "NilaiSikap") placeholderText = "A/B/C/D"; else if(cat === "NilaiKokurikuler") placeholderText = "Teks deskripsi singkat...";
+            let placeholderText = "0-100"; 
+            if(cat === "NilaiEkskul") placeholderText = "Pramuka:A, Tari:B"; 
+            else if(cat === "NilaiSikap") placeholderText = "A/B/C/D"; 
+            else if(cat === "NilaiKokurikuler") placeholderText = "Teks deskripsi singkat...";
+            else if(cat === "NilaiCP") placeholderText = "Tulis Capaian Kompetensi..."; // Placeholder CP
             
-            tbody.innerHTML = dataBelumDinilai.map((s, idx) => `
+            tbody.innerHTML = dataBelumDinilai.map((s, idx) => {
+                let inputField = `<input type="text" class="w-full text-base md:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-bold val-input-nilai outline-none transition dark:text-white" placeholder="${placeholderText}">`;
+
+                // Logika TEXTAREA untuk CP & Kokurikuler (Melebar Otomatis)
+                if(cat === "NilaiCP" || cat === "NilaiKokurikuler") {
+                    inputField = `<textarea class="w-full text-base md:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-bold val-input-nilai outline-none transition dark:text-white resize-none overflow-hidden" rows="2" placeholder="${placeholderText}" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>`;
+                }
+
+                return `
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-b border-gray-200 dark:border-gray-700 p-3 md:p-0 row-nilai-manual">
                     <td class="px-3 md:px-4 py-2 md:py-4 text-sm text-gray-500 dark:text-gray-400 flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-600 dark:text-gray-300">Absen:</span> <span>${s.No_Absen}</span></td>
                     <td class="px-3 md:px-4 py-2 md:py-4 text-sm font-bold md:font-medium flex justify-between md:table-cell attr-nis"><span class="md:hidden font-bold text-gray-600 dark:text-gray-300">NIS:</span> <span>${s.NIS}</span></td>
                     <td class="px-3 md:px-4 py-2 md:py-4 text-sm font-bold md:font-semibold flex flex-col md:table-cell attr-nama"><span class="md:hidden font-bold text-gray-600 dark:text-gray-300 mb-1">Nama Lengkap:</span> <span class="text-lg md:text-sm text-indigo-700 md:text-gray-800 dark:text-indigo-300 dark:md:text-white">${s.Nama_Lengkap}</span></td>
                     <td class="px-3 md:px-4 py-3 md:py-4 flex flex-col md:table-cell bg-gray-50/50 md:bg-transparent dark:bg-gray-900/50 rounded-lg md:rounded-none mt-2 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2 uppercase">Form Input:</span>
-                        <input type="text" class="w-full text-base md:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-bold val-input-nilai outline-none transition dark:text-white" placeholder="${placeholderText}">
+                        ${inputField}
                         <p class="text-xs text-red-500 mt-1 font-semibold err-msg hidden" id="err-man-${idx}"></p>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function checkNilaiRule(val, kategori) {
@@ -865,6 +877,7 @@
             if(kategori === "NilaiMapel") { const num = Number(val); if(!/^\d+$/.test(val) || isNaN(num) || num < 1 || num > 100) return "Wajib angka 1-100"; } 
             else if(kategori === "NilaiSikap") { if(!['A','B','C','D'].includes(val.toUpperCase())) return "Wajib huruf A/B/C/D"; }
             else if(kategori === "NilaiEkskul") { const regex = /^([^:]+:[A-D])(,\s*[^:]+:[A-D])*$/i; if(!regex.test(val)) return "Format salah. Cth: Pramuka:A, Tari:B"; }
+            // NilaiCP & NilaiKokurikuler lolos asal tidak kosong
             return "valid";
         }
 
@@ -892,8 +905,13 @@
                 const nama = row.querySelector('.attr-nama').innerText.replace('Nama Lengkap:','').trim(); 
                 const val = row.querySelector('.val-input-nilai').value.trim();
                 let obj = { NIS: nis, Nama_Siswa: nama, Kelas: kelas };
+                
                 if(tableName==="NilaiMapel") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Nilai_Akhir = val; }
-                else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
+                else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } // SIMPAN DATA CP
+                else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; 
+                else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); 
+                else obj.Keterangan_Kokurikuler = val;
+                
                 payloadArray.push(obj);
             });
 
@@ -950,8 +968,13 @@
                 if(!line.trim()) return;
                 let parsed = parsePastedRow(line); let siswaMatch = dataKelasValid.find(s => String(s.NIS).trim() === parsed.nis);
                 let obj = { NIS: parsed.nis, Nama_Siswa: siswaMatch.Nama_Lengkap, Kelas: kelas }; const val = parsed.nilai;
+                
                 if(tableName==="NilaiMapel") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Nilai_Akhir = val; }
-                else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
+                else if(tableName==="NilaiCP") { obj.Mata_Pelajaran = SESSION_DATA.Mapel; obj.Deskripsi_CP = val; } 
+                else if(tableName==="NilaiEkskul") obj.Data_Ekskul = val; 
+                else if(tableName==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); 
+                else obj.Keterangan_Kokurikuler = val;
+                
                 payloadArray.push(obj);
             });
 
@@ -969,7 +992,7 @@
             let targetData = ALL_NILAI_DATA[catSelect] || [];
             
             if(SESSION_DATA.Role !== 'Admin') {
-                if(catSelect === "NilaiMapel") {
+                if(catSelect === "NilaiMapel" || catSelect === "NilaiCP") {
                     targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel);
                     const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase());
                     targetData = targetData.filter(n => arr.includes(String(n.Kelas).trim().toUpperCase()));
@@ -980,13 +1003,17 @@
             if(k && k !== "Semua") targetData = targetData.filter(n => String(n.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if(q) targetData = targetData.filter(n => n.Nama_Siswa.toLowerCase().includes(q) || String(n.NIS).includes(q));
 
-            if(catSelect === "NilaiKokurikuler") thInfo.innerText = "Status Koku"; else if(catSelect === "NilaiMapel") thInfo.innerText = "Mata Pelajaran"; else if(catSelect === "NilaiEkskul") thInfo.innerText = "Daftar Ekskul"; else thInfo.innerText = "Kategori";
+            if(catSelect === "NilaiKokurikuler") thInfo.innerText = "Status Koku"; 
+            else if(catSelect === "NilaiMapel" || catSelect === "NilaiCP") thInfo.innerText = "Mata Pelajaran"; 
+            else if(catSelect === "NilaiEkskul") thInfo.innerText = "Daftar Ekskul"; 
+            else thInfo.innerText = "Kategori";
 
             if(targetData.length === 0) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 block md:table-cell">Tidak ada data.</td></tr>`; return; }
 
             tbody.innerHTML = targetData.map(n => {
                 let infoCol = "-", nilaiCol = "-";
                 if(catSelect === "NilaiMapel") { infoCol = n.Mata_Pelajaran; nilaiCol = `<span class="font-bold text-indigo-700 dark:text-indigo-400 text-lg md:text-base">${n.Nilai_Akhir}</span>`; }
+                else if(catSelect === "NilaiCP") { infoCol = n.Mata_Pelajaran; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Deskripsi_CP||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"><i class="fa-solid fa-eye"></i> Lihat CP</button>`; }
                 else if(catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = n.Data_Ekskul.split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm"><b>${parts[0].trim()}</b>: ${parts[1]?.trim()}</span>`; }); nilaiCol = ekskulArray.join(''); }
                 else if(catSelect === "NilaiSikap") { infoCol = "Predikat"; nilaiCol = `<span class="font-bold text-green-600 dark:text-green-400 text-lg md:text-base">${n.Predikat_Sikap}</span>`; }
                 else if(catSelect === "NilaiKokurikuler") { infoCol = "Sudah Diisi"; nilaiCol = `<button onclick="previewKoku('${n.Nama_Siswa}', '${(n.Keterangan_Kokurikuler||'').replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"><i class="fa-solid fa-eye"></i> Lihat Preview</button>`; }
@@ -1027,10 +1054,10 @@
             }
 
             let targetData = (ALL_NILAI_DATA[catSelect] || []).filter(n => String(n.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
-            if (SESSION_DATA.Role !== 'Admin' && catSelect === "NilaiMapel") { targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel); }
+            if (SESSION_DATA.Role !== 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) { targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel); }
 
             if (thInfo) {
-                if (catSelect === "NilaiMapel") thInfo.innerText = "Mata Pelajaran";
+                if (catSelect === "NilaiMapel" || catSelect === "NilaiCP") thInfo.innerText = "Mata Pelajaran";
                 else if (catSelect === "NilaiEkskul") thInfo.innerText = "Daftar Ekskul";
                 else if (catSelect === "NilaiKokurikuler") thInfo.innerText = "Kokurikuler";
                 else thInfo.innerText = "Kategori Sikap";
@@ -1042,19 +1069,21 @@
 
                 if (gradeRecord) {
                     if (catSelect === "NilaiMapel") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Nilai_Akhir}</span>`; } 
+                    else if (catSelect === "NilaiCP") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = "Teks CP Tersimpan"; } 
                     else if (catSelect === "NilaiEkskul") { infoCol = "Ekskul"; let ekskulArray = (gradeRecord.Data_Ekskul || "").split(',').map(e => { let parts = e.split(':'); return `<span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded text-xs border border-gray-200 dark:border-gray-600 inline-block m-0.5 shadow-sm">${parts[0].trim()}: <b>${parts[1]?.trim()}</b></span>`; }); nilaiCol = ekskulArray.join(''); } 
                     else if (catSelect === "NilaiSikap") { infoCol = "Sikap"; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Predikat_Sikap}</span>`; } 
                     else if (catSelect === "NilaiKokurikuler") { infoCol = "Kokurikuler"; nilaiCol = "Teks Tersimpan"; }
 
-                    const mapelParam = (catSelect === "NilaiMapel") ? gradeRecord.Mata_Pelajaran : "-";
-                    const rawVal = (catSelect === "NilaiMapel") ? gradeRecord.Nilai_Akhir : (catSelect === "NilaiEkskul") ? gradeRecord.Data_Ekskul : (catSelect === "NilaiSikap") ? gradeRecord.Predikat_Sikap : gradeRecord.Keterangan_Kokurikuler;
+                    const mapelParam = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? gradeRecord.Mata_Pelajaran : "-";
+                    const rawVal = (catSelect === "NilaiMapel") ? gradeRecord.Nilai_Akhir : (catSelect === "NilaiEkskul") ? gradeRecord.Data_Ekskul : (catSelect === "NilaiSikap") ? gradeRecord.Predikat_Sikap : (catSelect === "NilaiCP") ? gradeRecord.Deskripsi_CP : gradeRecord.Keterangan_Kokurikuler;
+                    
                     const safeName = s.Nama_Lengkap.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     const safeRawVal = String(rawVal || "").replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 
                     btnAction = `<div class="flex md:justify-center gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 md:flex-none bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-blue-200 dark:hover:bg-blue-800 transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
                                  <button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-red-200 dark:hover:bg-red-800 transition"><i class="fa-solid fa-trash"></i></button></div>`;
                 } else {
-                    infoCol = (catSelect === "NilaiMapel") ? (SESSION_DATA.Mapel || "-") : "-";
+                    infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Mapel || "-") : "-";
                     nilaiCol = `<span class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">Belum dinilai</span>`;
                 }
 
@@ -1071,9 +1100,25 @@
 
         function bukaModalEditNilai(nis, nama, catSelect, mapelParam, nilaiLama) {
             document.getElementById('edit-nilai-nis').value = nis; document.getElementById('edit-nilai-nama').value = nama; document.getElementById('edit-nilai-kelas').value = document.getElementById('pk-kelas').value; document.getElementById('edit-nilai-kategori').value = catSelect; document.getElementById('edit-nilai-mapel').value = mapelParam;
-            const inputVal = document.getElementById('edit-nilai-val'); const lblVal = document.getElementById('label-input-edit-nilai'); const panduan = document.getElementById('panduan-edit-nilai');
-            inputVal.value = nilaiLama;
+            
+            const inputVal = document.getElementById('edit-nilai-val');
+            const areaVal = document.getElementById('edit-nilai-val-area');
+            const lblVal = document.getElementById('label-input-edit-nilai'); 
+            const panduan = document.getElementById('panduan-edit-nilai');
+            
+            // Switch antara input biasa dan textarea
+            if(catSelect === "NilaiCP" || catSelect === "NilaiKokurikuler") {
+                inputVal.classList.add('hidden');
+                areaVal.classList.remove('hidden');
+                areaVal.value = nilaiLama;
+            } else {
+                areaVal.classList.add('hidden');
+                inputVal.classList.remove('hidden');
+                inputVal.value = nilaiLama;
+            }
+
             if(catSelect === "NilaiMapel") { lblVal.innerText = `Nilai Akhir ${mapelParam}`; panduan.innerText = "Format: Angka 1-100"; }
+            else if(catSelect === "NilaiCP") { lblVal.innerText = `Capaian Kompetensi ${mapelParam}`; panduan.innerText = "Format: Teks deskripsi..."; }
             else if(catSelect === "NilaiEkskul") { lblVal.innerText = "Daftar Ekskul & Nilai"; panduan.innerText = "Format: Pramuka:A, Tari:B"; }
             else if(catSelect === "NilaiSikap") { lblVal.innerText = "Predikat Sikap / BK"; panduan.innerText = "Format: A / B / C / D"; }
             else { lblVal.innerText = "Teks Kokurikuler"; panduan.innerText = "Format: Teks deskripsi..."; }
@@ -1089,11 +1134,19 @@
 
         async function submitEditNilaiServer(e) {
             e.preventDefault();
-            const nis = document.getElementById('edit-nilai-nis').value; const nama = document.getElementById('edit-nilai-nama').value; const kelas = document.getElementById('edit-nilai-kelas').value; const cat = document.getElementById('edit-nilai-kategori').value; const mapel = document.getElementById('edit-nilai-mapel').value; const val = document.getElementById('edit-nilai-val').value;
+            const nis = document.getElementById('edit-nilai-nis').value; const nama = document.getElementById('edit-nilai-nama').value; const kelas = document.getElementById('edit-nilai-kelas').value; const cat = document.getElementById('edit-nilai-kategori').value; const mapel = document.getElementById('edit-nilai-mapel').value; 
+            
+            // Tangkap dari form yang sedang aktif
+            const val = (cat === "NilaiCP" || cat === "NilaiKokurikuler") ? document.getElementById('edit-nilai-val-area').value : document.getElementById('edit-nilai-val').value;
+            
             const valRes = checkNilaiRule(val, cat); if(valRes !== "valid") { showToast(valRes, 'warning'); return; }
 
             let obj = { NIS: nis, Nama_Siswa: nama, Kelas: kelas };
-            if(cat==="NilaiMapel") { obj.Mata_Pelajaran = mapel; obj.Nilai_Akhir = val; } else if(cat==="NilaiEkskul") obj.Data_Ekskul = val; else if(cat==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); else obj.Keterangan_Kokurikuler = val;
+            if(cat==="NilaiMapel") { obj.Mata_Pelajaran = mapel; obj.Nilai_Akhir = val; } 
+            else if(cat==="NilaiCP") { obj.Mata_Pelajaran = mapel; obj.Deskripsi_CP = val; } 
+            else if(cat==="NilaiEkskul") obj.Data_Ekskul = val; 
+            else if(cat==="NilaiSikap") obj.Predikat_Sikap = val.toUpperCase(); 
+            else obj.Keterangan_Kokurikuler = val;
 
             closeModalEditNilai(); isSyncing = true; startProgress('app-progress'); showToast('Menyimpan perubahan...', 'info');
             try { const json = await fetchFromGoogle("insertNilaiSingle", cat, obj); if(json.status === 'success') { showToast("Nilai berhasil diupdate!", 'success'); await manualSync(); } else showToast("Gagal update.", 'error'); } catch(e) { showToast("Error koneksi.", 'error'); }
@@ -1180,7 +1233,6 @@
             if(m) m.classList.add('bg-indigo-800/50', 'dark:bg-gray-800/80', 'border-indigo-400'); 
             document.getElementById('page-title').innerText = p.replace('-', ' ').toUpperCase(); 
             
-            // Auto close sidebar on mobile after clicking menu
             if(window.innerWidth < 768) toggleSidebar();
         }
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
