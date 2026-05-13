@@ -1109,7 +1109,6 @@
         }
 
         function filterTabelSiswa() {
-           function filterTabelSiswa() {
             const k = document.getElementById('filter-kelas-daftar')?.value || "Semua"; 
             const q = (document.getElementById('search-siswa-daftar')?.value || "").toLowerCase();  let d = MASTER_DATA_SISWA;
             if(SESSION_DATA.Role !== 'Admin') { const arr = SESSION_DATA.Kelas_Diajar.split(',').map(x=>x.trim().toUpperCase()); d = d.filter(s => arr.includes(String(s.Kelas).trim().toUpperCase())); }
