@@ -641,7 +641,12 @@
                         
                         <!-- Form Paste Excel (Admin Only) -->
                         <div id="area-ms-bulk" class="hidden">
-                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-4 rounded-xl mb-4 text-sm"><p><i class="fa-solid fa-info-circle mr-2 text-blue-600"></i> Pastikan format <strong>24 KOLOM</strong> dari Excel sesuai urutan Dapodik. Kolom kosong akan otomatis diisi "-".</p></div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 p-4 rounded-xl mb-4 text-sm"><div class="space-y-2">
+    <p><i class="fa-solid fa-info-circle mr-2 text-blue-600"></i> Pastikan format <strong>26 KOLOM</strong> dari Excel berurutan dari kiri ke kanan seperti ini:</p>
+    <p class="text-[11px] bg-white dark:bg-gray-800 p-2 rounded border border-blue-100 dark:border-blue-800/50 font-mono leading-relaxed">
+        1.Absen | 2.NIS | 3.NISN | 4.Nama | 5.L/P | 6.Tempat Lahir | 7.Tgl Lahir | 8.Agama | 9.Status Kel | 10.Anak Ke | 11.Alamat Siswa | 12.Telp Siswa | 13.Sekolah Asal | 14.Diterima Kelas | 15.Diterima Tgl | 16.Nama Ayah | 17.Nama Ibu | 18.Alamat Ortu | 19.Telp Ortu | 20.Kerja Ayah | 21.Kerja Ibu | 22.Nama Wali | 23.Alamat Wali | 24.Telp Wali | 25.Kerja Wali | 26.Kelas Aktif
+    </p>
+</div></div>
                             <textarea id="inp-excel-paste" rows="10" placeholder="Paste data siswa dari Excel di sini (Tanpa Header)..." class="w-full rounded-xl bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 border p-4 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-gray-300 shadow-inner"></textarea>
                             <div class="mt-4 text-right"><button onclick="submitBulkSiswa()" id="btn-simpan-siswa-bulk" class="w-full md:w-auto bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg transition"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Import & Simpan Semua</button></div>
                         </div>
@@ -1527,15 +1532,64 @@
         function hapusSiswaLokal(nisLama) { MASTER_DATA_SISWA = MASTER_DATA_SISWA.filter(s => (s._nis_lama || s.NIS) != nisLama); PENDING_EDITS = PENDING_EDITS.filter(x => x.NIS_Lama != nisLama); if(!PENDING_DELETES.includes(nisLama)) PENDING_DELETES.push(nisLama); renderTabelManajemen(); updatePendingUI(); updateDashboardAndData(); showToast("Data masuk antrean hapus.", 'warning'); }
 
         async function submitBulkSiswa() { 
-            const raw = document.getElementById('inp-excel-paste').value.trim(); if(!raw) return showToast('Kosong.', 'warning'); 
-            const btn = document.getElementById('btn-simpan-siswa-bulk'); btn.disabled = true; isSyncing = true; startProgress('app-progress'); 
+            const raw = document.getElementById('inp-excel-paste').value.trim(); 
+            if(!raw) return showToast('Area paste masih kosong.', 'warning'); 
+            
+            const btn = document.getElementById('btn-simpan-siswa-bulk'); 
+            btn.disabled = true; isSyncing = true; startProgress('app-progress'); 
+            
             const dataArray = raw.split('\n').filter(l => l.trim().length > 0).map(l => { 
                 const c = l.split('\t'); 
+                
+                // Ambil data kelas dari kolom ke-14 (Index 13: "Diterima di Kelas")
+                const kelasSiswa = c[13]?.trim().toUpperCase() || "-";
+
                 return { 
-                    No_Absen: c[0]?.trim() || "-", NIS: c[1]?.trim() || "-", Nama_Lengkap: toTitleCase(c[2]?.trim() || ""), Kelas: c[3]?.trim().toUpperCase() || "-", Gender: c[4]?.trim().toUpperCase() || "L", NISN: c[5]?.trim() || "-", Tempat_Lahir: c[6]?.trim() || "-", Tanggal_Lahir: c[7]?.trim() || "-", Agama: c[8]?.trim() || "-", Status_Keluarga: c[9]?.trim() || "-", Anak_Ke: c[10]?.trim() || "-", Alamat_Siswa: c[11]?.trim() || "-", Telp_Siswa: c[12]?.trim() || "-", Nama_Ayah: c[13]?.trim() || "-", Nama_Ibu: c[14]?.trim() || "-", Kerja_Ayah: c[15]?.trim() || "-", Kerja_Ibu: c[16]?.trim() || "-", Alamat_Ortu: c[17]?.trim() || "-", Telp_Ortu: c[18]?.trim() || "-", Sekolah_Asal: c[19]?.trim() || "-", Diterima_Kelas: c[20]?.trim() || "-", Diterima_Tanggal: c[21]?.trim() || "-", Nama_Wali: c[22]?.trim() || "-", Kerja_Wali: c[23]?.trim() || "-", Alamat_Wali: c[24]?.trim() || "-", Telp_Wali: c[25]?.trim() || "-"
+                    No_Absen: c[0]?.trim() || "-", 
+                    NIS: c[1]?.trim() || "-", 
+                    NISN: c[2]?.trim() || "-", 
+                    Nama_Lengkap: toTitleCase(c[3]?.trim() || ""), 
+                    Gender: c[4]?.trim().toUpperCase() || "L", 
+                    Tempat_Lahir: toTitleCase(c[5]?.trim() || "-"), 
+                    Tanggal_Lahir: c[6]?.trim() || "-", 
+                    Agama: toTitleCase(c[7]?.trim() || "-"), 
+                    Status_Keluarga: toTitleCase(c[8]?.trim() || "-"), 
+                    Anak_Ke: c[9]?.trim() || "-", 
+                    Alamat_Siswa: c[10]?.trim() || "-", 
+                    Telp_Siswa: c[11]?.trim() || "-", 
+                    Sekolah_Asal: toTitleCase(c[12]?.trim() || "-"), 
+                    Diterima_Kelas: kelasSiswa, 
+                    Diterima_Tanggal: c[14]?.trim() || "-", 
+                    Nama_Ayah: toTitleCase(c[15]?.trim() || "-"), 
+                    Nama_Ibu: toTitleCase(c[16]?.trim() || "-"), 
+                    Alamat_Ortu: c[17]?.trim() || "-", 
+                    Telp_Ortu: c[18]?.trim() || "-", 
+                    Kerja_Ayah: toTitleCase(c[19]?.trim() || "-"), 
+                    Kerja_Ibu: toTitleCase(c[20]?.trim() || "-"), 
+                    Nama_Wali: toTitleCase(c[21]?.trim() || "-"), 
+                    Alamat_Wali: c[22]?.trim() || "-", 
+                    Telp_Wali: c[23]?.trim() || "-", 
+                    Kerja_Wali: toTitleCase(c[24]?.trim() || "-"), 
+                    
+                    // KUNCI PERBAIKAN: Masukkan kelasSiswa ke "Kelas" aktif
+                    Kelas: kelasSiswa 
                 }; 
             }).filter(item => item.NIS && item.NIS !== "-"); 
-            try { const json = await fetchFromGoogle("insertBulk", "DataSiswa", dataArray); if(json.status==='success') { showToast("Data diimport!", 'success'); document.getElementById('inp-excel-paste').value = ""; await manualSync(); if(json.message.includes('dilewati')) alert(json.message); } else showToast(json.message, 'error'); } catch(e) { showToast("Error koneksi.", 'error'); } 
+            
+            try { 
+                const json = await fetchFromGoogle("insertBulk", "DataSiswa", dataArray); 
+                if(json.status === 'success') { 
+                    showToast("Data massal berhasil diimport!", 'success'); 
+                    document.getElementById('inp-excel-paste').value = ""; 
+                    await manualSync(); 
+                    if(json.message.includes('dilewati')) alert(json.message); 
+                } else {
+                    showToast(json.message, 'error'); 
+                }
+            } catch(e) { 
+                showToast("Error koneksi ke server.", 'error'); 
+            } 
+            
             btn.disabled = false; isSyncing = false; endProgress('app-progress'); 
         }
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
