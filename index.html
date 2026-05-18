@@ -33,6 +33,7 @@
     </script>
 
     <style>
+        .dark select option { background-color: #1f2937; color: #f3f4f6; }
         .submenu { transition: max-height 0.3s ease-in-out; max-height: 0; overflow: hidden; }
         .submenu.open { max-height: 500px; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -1410,9 +1411,12 @@
 
         function renderTabelKelolaNilai() {
             const catSelect = document.getElementById('pk-kategori')?.value; const k = document.getElementById('pk-kelas')?.value; const q = (document.getElementById('pk-search')?.value || "").toLowerCase(); const tbody = document.getElementById('pk-tbody'); const thInfo = document.getElementById('pk-th'); if (!tbody) return;
+            
             if (!k || k === "Semua" || k === "") { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Silakan pilih kelas terlebih dahulu.</td></tr>`; return; }
+            
             let studentsInClass = MASTER_DATA_SISWA.filter(s => String(s.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase()); if (q) studentsInClass = studentsInClass.filter(s => s.Nama_Lengkap.toLowerCase().includes(q) || String(s.NIS).includes(q));
             if (studentsInClass.length === 0) { tbody.innerHTML = `<tr class="block md:table-row"><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic block md:table-cell">Tidak ada data siswa.</td></tr>`; return; }
+            
             let targetData = (ALL_NILAI_DATA[catSelect] || []).filter(n => String(n.Kelas).trim().toUpperCase() === String(k).trim().toUpperCase());
             if (SESSION_DATA.Role !== 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) { targetData = targetData.filter(n => n.Mata_Pelajaran === SESSION_DATA.Mapel); }
             if (SESSION_DATA.Role === 'Admin' && (catSelect === "NilaiMapel" || catSelect === "NilaiCP")) { const adminMapelFilter = document.getElementById('pk-mapel-admin')?.value; if (adminMapelFilter) { targetData = targetData.filter(n => n.Mata_Pelajaran === adminMapelFilter); } }
@@ -1420,13 +1424,31 @@
 
             tbody.innerHTML = studentsInClass.map(s => {
                 let gradeRecord = targetData.find(n => String(n.NIS).trim() === String(s.NIS).trim()); let infoCol = "-", nilaiCol = "-", btnAction = "-";
+                
                 if (gradeRecord) {
-                    if (catSelect === "NilaiMapel") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="font-bold text-gray-800 text-lg">${gradeRecord.Nilai_Akhir}</span>`; } else if (catSelect === "NilaiCP") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded">Teks Tersimpan</span>`; } else if (catSelect === "NilaiEkskul") { infoCol = "Ekskul"; nilaiCol = gradeRecord.Data_Ekskul; } else if (catSelect === "NilaiSikap") { infoCol = "Sikap"; nilaiCol = `<span class="font-bold text-gray-800 text-lg">${gradeRecord.Predikat_Sikap}</span>`; } else if (catSelect === "NilaiKokurikuler") { infoCol = "Kokurikuler"; nilaiCol = `<span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded">Teks Tersimpan</span>`; }
+                    if (catSelect === "NilaiMapel") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Nilai_Akhir}</span>`; } 
+                    else if (catSelect === "NilaiCP") { infoCol = gradeRecord.Mata_Pelajaran || SESSION_DATA.Mapel; nilaiCol = `<span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded border border-indigo-100 dark:border-indigo-800/50">Teks Tersimpan</span>`; } 
+                    else if (catSelect === "NilaiEkskul") { infoCol = "Ekskul"; nilaiCol = gradeRecord.Data_Ekskul; } 
+                    else if (catSelect === "NilaiSikap") { infoCol = "Sikap"; nilaiCol = `<span class="font-bold text-gray-800 dark:text-gray-100 text-lg md:text-base">${gradeRecord.Predikat_Sikap}</span>`; } 
+                    else if (catSelect === "NilaiKokurikuler") { infoCol = "Kokurikuler"; nilaiCol = `<span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded border border-indigo-100 dark:border-indigo-800/50">Teks Tersimpan</span>`; }
+                    
                     const mapelParam = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? gradeRecord.Mata_Pelajaran : "-"; const rawVal = (catSelect === "NilaiMapel") ? gradeRecord.Nilai_Akhir : (catSelect === "NilaiEkskul") ? gradeRecord.Data_Ekskul : (catSelect === "NilaiSikap") ? gradeRecord.Predikat_Sikap : (catSelect === "NilaiCP") ? gradeRecord.Deskripsi_CP : gradeRecord.Keterangan_Kokurikuler;
                     const safeName = s.Nama_Lengkap.replace(/'/g, "\\'").replace(/"/g, '&quot;'); const safeRawVal = String(rawVal || "").replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-                    btnAction = `<div class="flex gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition"><i class="fa-solid fa-pen"></i></button><button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="flex-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 transition"><i class="fa-solid fa-trash"></i></button></div>`;
-                } else { infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Role==='Admin' ? "-" : SESSION_DATA.Mapel || "-") : "-"; nilaiCol = `<span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">Belum dinilai</span>`; }
-                return `<tr class="hover:bg-gray-50 border-b border-gray-200 p-3"><td class="px-4 py-4 text-sm">${s.NIS}</td><td class="px-4 py-4 text-sm font-medium">${s.Nama_Lengkap}</td><td class="px-4 py-4 text-sm">${infoCol}</td><td class="px-4 py-4 text-center text-sm">${nilaiCol}</td><td class="px-4 py-4 text-center">${btnAction}</td></tr>`;
+                    
+                    btnAction = `<div class="flex md:justify-center gap-2"><button onclick="bukaModalEditNilai('${s.NIS}', '${safeName}', '${catSelect}', '${mapelParam}', '${safeRawVal}')" class="flex-1 md:flex-none bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-blue-200 dark:hover:bg-blue-800 transition shadow-sm"><i class="fa-solid fa-pen md:mr-1"></i> <span class="hidden md:inline">Edit</span></button><button onclick="hapusNilaiServer('${catSelect}', '${s.NIS}', '${mapelParam}')" class="flex-1 md:flex-none bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 md:px-3 py-2 md:py-1.5 rounded-lg text-sm md:text-xs font-bold hover:bg-red-200 dark:hover:bg-red-800 transition shadow-sm"><i class="fa-solid fa-trash"></i></button></div>`;
+                } else { 
+                    infoCol = (catSelect === "NilaiMapel" || catSelect === "NilaiCP") ? (SESSION_DATA.Role==='Admin' ? "-" : SESSION_DATA.Mapel || "-") : "-"; 
+                    nilaiCol = `<span class="text-xs font-bold text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-100 dark:border-red-800/50">Belum dinilai</span>`; 
+                }
+                
+                return `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 block md:table-row border-b md:border-none border-gray-200 dark:border-gray-700 p-3 md:p-0">
+                    <td class="px-3 md:px-4 py-2 md:py-4 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">NIS:</span> <span class="text-gray-800 dark:text-gray-200">${s.NIS}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-4 text-sm font-bold md:font-medium flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">Nama:</span> <span class="text-right text-gray-800 dark:text-gray-200">${s.Nama_Lengkap}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-4 text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500">Kategori:</span> <span class="text-right text-gray-800 dark:text-gray-200">${infoCol}</span></td>
+                    <td class="px-3 md:px-4 py-2 md:py-4 md:text-center text-sm flex justify-between md:table-cell"><span class="md:hidden font-bold text-gray-500 self-center">Nilai:</span> <div>${nilaiCol}</div></td>
+                    <td class="px-3 md:px-4 py-3 md:py-4 md:text-center flex flex-col md:table-cell mt-2 border-t border-gray-100 dark:border-gray-700 md:border-none md:mt-0">${btnAction}</td>
+                </tr>`;
             }).join('');
         }
 
